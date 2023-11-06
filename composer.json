@@ -1,0 +1,10 @@
+{
+    "name": "chieff/yii2-user-profile-module",
+    "description": "User profile for webvimark/user-management",
+    "autoload": {
+        "psr-4": {
+            "chieff\\modules\\UserProfile": ""
+        }
+    },
+    "require": {}
+}
