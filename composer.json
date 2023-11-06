@@ -3,7 +3,7 @@
     "description": "User profile for webvimark/user-management",
     "autoload": {
         "psr-4": {
-            "chieff\\modules\\UserProfile": ""
+            "chieff\\modules\\UserProfile\\": ""
         }
     },
     "require": {}
