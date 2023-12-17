@@ -3,6 +3,7 @@
 namespace chieff\modules\UserProfile\models\forms;
 
 use chieff\modules\UserProfile\models\UserProfile;
+use chieff\helpers\SecurityHelper;
 use webvimark\modules\UserManagement\models\User;
 use webvimark\modules\UserManagement\UserManagementModule;
 use yii\helpers\ArrayHelper;
@@ -63,16 +64,36 @@ class RegistrationForm extends \webvimark\modules\UserManagement\models\forms\Re
         ) {
             $file_alias = '@webroot';
             $file_folder = '/uploads/avatars/';
+
             $file_folder_path = Yii::getAlias($file_alias . $file_folder);
             if (!is_dir($file_folder_path)) {
                 if (!mkdir($file_folder_path, 0777, true)) {
                     return '';
                 }
             }
+
             $file_name = 'avatar_' . $user_id . '.' . $this->avatar_file->getExtension();
-            if ($this->avatar_file->saveAs($file_alias . $file_folder . $file_name)) {
+
+            $file_full_path = $file_folder_path . $file_name;
+            $file_alias_full_path = $file_alias . $file_folder . $file_name;
+
+            if ($this->avatar_file->saveAs($file_alias_full_path)) {
+                if (Yii::$app->getModule('user-profile')->encodeAvatar) {
+                    $data = file_get_contents($file_full_path);
+                    $data = SecurityHelper::encode($data, 'aes-256-ctr', Yii::$app->getModule('user-profile')->passphrase);
+                    if ($data) {
+                        if (file_put_contents($file_full_path, $data) === false) {
+                            unset($file_full_path);
+                            return '';
+                        }
+                    } else {
+                        unset($file_full_path);
+                        return '';
+                    }
+                }
                 return $file_folder . $file_name;
             }
+
             return '';
         }
         return '';

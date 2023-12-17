@@ -7,6 +7,7 @@
         }
     },
     "require": {
+        "chieff/helpers": "*",
         "kartik-v/yii2-widget-fileinput": "dev-master"
     }
 }

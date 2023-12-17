@@ -2,6 +2,7 @@
 
 namespace chieff\modules\UserProfile\models;
 
+use chieff\helpers\SecurityHelper;
 use Yii;
 use webvimark\modules\UserManagement\models\User;
 
@@ -65,6 +66,16 @@ class UserProfile extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
+
+    public function getAvatar()
+    {
+        if (Yii::$app->getModule('user-profile')->encodeAvatar) {
+            $file_alias = Yii::getAlias('@webroot');
+            $file_full_path = $file_alias . $this->avatar;
+            return SecurityHelper::getImageContent($file_full_path, true, 'aes-256-ctr', Yii::$app->getModule('user-profile')->passphrase);
+        }
+        return $this->avatar;
     }
 
     public function beforeDelete()
