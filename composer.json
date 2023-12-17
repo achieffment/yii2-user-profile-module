@@ -6,5 +6,7 @@
             "chieff\\modules\\UserProfile\\": ""
         }
     },
-    "require": {}
+    "require": {
+        "kartik-v/yii2-widget-fileinput": "dev-master"
+    }
 }
