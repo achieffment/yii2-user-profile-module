@@ -2,6 +2,8 @@
 
 namespace chieff\modules\UserProfile;
 
+use Yii;
+
 class UserProfileModule extends \yii\base\Module
 {
     /**
@@ -18,6 +20,16 @@ class UserProfileModule extends \yii\base\Module
      */
     public $passphrase = '';
 
+    public $arraySex = [
+        -1 => 'Не выбрано',
+        0 => 'Мужской',
+        1 => 'Женский'
+    ];
+
+    public $phoneRegexp = '^\+[1-9]{1} \(\d{3}\) \d{3}-\d{2}-\d{2}$';
+
+    public $phonePlaceholder = '+7 (999) 999-99-99';
+
     public $controllerNamespace = 'chieff\modules\UserProfile\controllers';
 
     /**
@@ -26,5 +38,31 @@ class UserProfileModule extends \yii\base\Module
     public function init()
     {
         parent::init();
+    }
+
+    /**
+     * I18N helper
+     *
+     * @param string $category
+     * @param string $message
+     * @param array $params
+     * @param null|string $language
+     *
+     * @return string
+     */
+    public static function t($category, $message, $params = [], $language = null)
+    {
+        if (!isset(Yii::$app->i18n->translations['modules/user-profile/*'])) {
+            Yii::$app->i18n->translations['modules/user-profile/*'] = [
+                'class' => 'yii\i18n\PhpMessageSource',
+                'sourceLanguage' => 'ru',
+                'basePath' => '@vendor/chieff/yii2-user-profile-module/messages',
+                'fileMap' => [
+                    'modules/user-profile/back' => 'back.php',
+                    'modules/user-profile/front' => 'front.php',
+                ],
+            ];
+        }
+        return Yii::t('modules/user-profile/' . $category, $message, $params, $language);
     }
 }

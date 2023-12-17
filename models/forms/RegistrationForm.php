@@ -4,6 +4,7 @@ namespace chieff\modules\UserProfile\models\forms;
 
 use chieff\modules\UserProfile\models\UserProfile;
 use chieff\helpers\SecurityHelper;
+use chieff\modules\UserProfile\UserProfileModule;
 use webvimark\modules\UserManagement\models\User;
 use webvimark\modules\UserManagement\UserManagementModule;
 use yii\helpers\ArrayHelper;
@@ -30,10 +31,52 @@ class RegistrationForm extends \webvimark\modules\UserManagement\models\forms\Re
         return ArrayHelper::merge(parent::rules(), [
             ['avatar_file', 'file'],
             [['firstname', 'lastname', 'patronymic', 'dob', 'phone', 'sex'], 'required'],
-            [['user_id', 'dob', 'sex'], 'integer'],
-            [['avatar', 'firstname', 'lastname', 'patronymic'], 'string', 'max' => 100],
+            [['user_id', 'sex'], 'integer'],
+            ['dob', 'validateDob'],
+            ['phone', 'validatePhone'],
             [['phone'], 'string', 'max' => 20],
+            [['firstname', 'lastname', 'patronymic'], 'validateName'],
+            [['firstname', 'lastname', 'patronymic'], 'string', 'min' => 2, 'max' => 100],
+            [['avatar'], 'string', 'max' => 100],
         ]);
+    }
+
+    public function validateDob()
+    {
+        if ($this->dob) {
+            $date = strtotime($this->dob);
+            if ($date === false) {
+                $this->addError('dob', UserProfileModule::t('front', 'Incorrect dob'));
+            }
+        }
+    }
+
+    public function validatePhone()
+    {
+        if ($this->phone) {
+            if (preg_match('/' . Yii::$app->getModule('user-profile')->phoneRegexp . '/', $this->phone) !== 1) {
+                $this->addError('phone', UserProfileModule::t('front', 'Incorrect phone'));
+            }
+        }
+    }
+
+    public function validateName()
+    {
+        if ($this->firstname) {
+            if (preg_match('/[A-Za-zА-Яа-я]{2,}/', $this->firstname) !== 1) {
+                $this->addError('firstname', UserProfileModule::t('front', 'Incorrect firstname'));
+            }
+        }
+        if ($this->lastname) {
+            if (preg_match('/[A-Za-zА-Яа-я]{2,}/', $this->lastname) !== 1) {
+                $this->addError('lastname', UserProfileModule::t('front', 'Incorrect lastname'));
+            }
+        }
+        if ($this->patronymic) {
+            if (preg_match('/[A-Za-zА-Яа-я]{2,}/', $this->patronymic) !== 1) {
+                $this->addError('patronymic', UserProfileModule::t('front', 'Incorrect patronymic'));
+            }
+        }
     }
 
     /**
@@ -43,15 +86,15 @@ class RegistrationForm extends \webvimark\modules\UserManagement\models\forms\Re
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'id' => 'ID',
-            'user_id' => 'User ID',
-            'avatar' => 'Avatar',
-            'avatar_file' => 'Avatar',
-            'firstname' => 'Firstname',
-            'lastname' => 'Lastname',
-            'patronymic' => 'Patronymic',
-            'dob' => 'Dob',
-            'phone' => 'Phone',
-            'sex' => 'Sex',
+            'user_id' => UserProfileModule::t('front', 'User ID'),
+            'avatar' => UserProfileModule::t('front', 'Avatar'),
+            'avatar_file' => UserProfileModule::t('front', 'Avatar'),
+            'firstname' => UserProfileModule::t('front', 'Firstname'),
+            'lastname' => UserProfileModule::t('front', 'Lastname'),
+            'patronymic' => UserProfileModule::t('front', 'Patronymic'),
+            'dob' => UserProfileModule::t('front', 'Dob'),
+            'phone' => UserProfileModule::t('front', 'Phone'),
+            'sex' => UserProfileModule::t('front', 'Sex'),
         ]);
     }
 
