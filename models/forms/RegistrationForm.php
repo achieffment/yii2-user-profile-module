@@ -53,9 +53,10 @@ class RegistrationForm extends \webvimark\modules\UserManagement\models\forms\Re
             [['firstname', 'lastname', 'patronymic'], 'string', 'min' => 2, 'max' => 100],
             [['avatar'], 'string', 'max' => 100],
             ['comment', 'string', 'max' => 500],
-            ['comment', 'purgeXSS'],
             ['social', 'string', 'max' => 1000],
             [['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'string', 'max' => 100],
+            [['firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'trim'],
+            [['firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'purgeXSS']
         ]);
     }
 

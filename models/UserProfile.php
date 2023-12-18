@@ -22,7 +22,7 @@ use yii\helpers\Url;
  * @property string $phone
  * @property int $sex
  * @property string $comment
- * @property string $job
+ * @property int $job
  * @property string $social
  */
 class UserProfile extends \yii\db\ActiveRecord
@@ -50,8 +50,9 @@ class UserProfile extends \yii\db\ActiveRecord
             [['firstname', 'lastname', 'patronymic'], 'string', 'min' => 2, 'max' => 100],
             [['avatar'], 'string', 'max' => 100],
             [['comment'], 'string', 'max' => 500],
-            ['comment', 'purgeXSS'],
             [['social'], 'string', 'max' => 1000],
+            [['firstname', 'lastname', 'patronymic', 'comment'], 'trim'],
+            [['firstname', 'lastname', 'patronymic', 'comment'], 'purgeXSS']
         ];
     }
 
