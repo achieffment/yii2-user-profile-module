@@ -9,6 +9,7 @@ use webvimark\modules\UserManagement\models\User;
 use webvimark\modules\UserManagement\UserManagementModule;
 use yii\helpers\ArrayHelper;
 use Yii;
+use yii\helpers\Html;
 use yii\web\UploadedFile;
 
 class RegistrationForm extends \webvimark\modules\UserManagement\models\forms\RegistrationForm
@@ -22,6 +23,19 @@ class RegistrationForm extends \webvimark\modules\UserManagement\models\forms\Re
     public $dob;
     public $phone;
     public $sex;
+    public $comment;
+    public $social;
+
+    public $vk;
+    public $ok;
+
+    public $telegram;
+    public $whatsapp;
+    public $viber;
+
+    public $youtube;
+    public $twitter;
+    public $facebook;
 
     /**
      * @return array
@@ -38,7 +52,21 @@ class RegistrationForm extends \webvimark\modules\UserManagement\models\forms\Re
             [['firstname', 'lastname', 'patronymic'], 'validateName'],
             [['firstname', 'lastname', 'patronymic'], 'string', 'min' => 2, 'max' => 100],
             [['avatar'], 'string', 'max' => 100],
+            ['comment', 'string', 'max' => 500],
+            ['comment', 'purgeXSS'],
+            ['social', 'string', 'max' => 1000],
+            [['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'string', 'max' => 100],
         ]);
+    }
+
+    /**
+     * Remove possible XSS stuff
+     *
+     * @param $attribute
+     */
+    public function purgeXSS($attribute)
+    {
+        $this->$attribute = Html::encode($this->$attribute);
     }
 
     public function validateDob()
@@ -94,6 +122,16 @@ class RegistrationForm extends \webvimark\modules\UserManagement\models\forms\Re
             'dob' => UserProfileModule::t('front', 'Dob'),
             'phone' => UserProfileModule::t('front', 'Phone'),
             'sex' => UserProfileModule::t('front', 'Sex'),
+            'comment' => UserProfileModule::t('front', 'Comment'),
+            'social' => UserProfileModule::t('front', 'Social'),
+            'vk' => UserProfileModule::t('front', 'Vk'),
+            'ok' => UserProfileModule::t('front', 'Ok'),
+            'telegram' => UserProfileModule::t('front', 'Telegram'),
+            'whatsapp' => UserProfileModule::t('front', 'Whatsapp'),
+            'viber' => UserProfileModule::t('front', 'Viber'),
+            'youtube' => UserProfileModule::t('front', 'Youtube'),
+            'twitter' => UserProfileModule::t('front', 'Twitter'),
+            'facebook' => UserProfileModule::t('front', 'Facebook')
         ]);
     }
 
@@ -152,6 +190,8 @@ class RegistrationForm extends \webvimark\modules\UserManagement\models\forms\Re
         $model->dob = $this->dob;
         $model->phone = $this->phone;
         $model->sex = $this->sex;
+        $model->comment = $this->comment;
+        $model->social = $model->getSocialStringFromArray($model);
         $model->save(false);
     }
 }

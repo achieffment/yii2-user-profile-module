@@ -113,6 +113,25 @@ $this->params['breadcrumbs'][] = UserManagementModule::t('back', 'Editing');
 
                 <?= $form->field($model, 'phone')->textInput(['maxlength' => 20, 'autocomplete' => 'off', 'placeholder' => Yii::$app->getModule('user-profile')->phonePlaceholder]) ?>
 
+                <?= $form->field($model, 'comment')->textarea(['maxlength' => 500]) ?>
+
+                <?= $form->field($model, 'job')->dropDownList(Yii::$app->getModule('user-profile')->arrayJob) ?>
+
+                <div class="row">
+                    <div class="col-6 col-sm-12 col-md-6">
+                        <?= $form->field($model, 'vk')->textInput(['maxlength' => 100, 'autocomplete' => 'off']) ?>
+                        <?= $form->field($model, 'ok')->textInput(['maxlength' => 100, 'autocomplete' => 'off']) ?>
+                        <?= $form->field($model, 'telegram')->textInput(['maxlength' => 100, 'autocomplete' => 'off']) ?>
+                        <?= $form->field($model, 'whatsapp')->textInput(['maxlength' => 100, 'autocomplete' => 'off']) ?>
+                    </div>
+                    <div class="col-6 col-sm-12 col-md-6">
+                        <?= $form->field($model, 'viber')->textInput(['maxlength' => 100, 'autocomplete' => 'off']) ?>
+                        <?= $form->field($model, 'youtube')->textInput(['maxlength' => 100, 'autocomplete' => 'off']) ?>
+                        <?= $form->field($model, 'twitter')->textInput(['maxlength' => 100, 'autocomplete' => 'off']) ?>
+                        <?= $form->field($model, 'facebook')->textInput(['maxlength' => 100, 'autocomplete' => 'off']) ?>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <?= Html::submitButton(
                         '<i class="fa fa-check"></i> ' . UserManagementModule::t('back', 'Save'),

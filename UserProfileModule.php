@@ -32,6 +32,18 @@ class UserProfileModule extends \yii\base\Module
 
     public $phonePlaceholder = '+7 (999) 999-99-99';
 
+    public $arrayJob = [
+        0 => 'Не выбрано',
+        1 => 'Менеджер по продажам',
+        2 => 'Аккаунт-менеджер',
+        3 => 'Маркетолог',
+        4 => 'Старший маркетолог',
+        5 => 'SEO-специалист',
+        6 => 'Старший SEO-специалист',
+        7 => 'Программист',
+        8 => 'Старший программист',
+    ];
+
     public $controllerNamespace = 'chieff\modules\UserProfile\controllers';
 
     /**

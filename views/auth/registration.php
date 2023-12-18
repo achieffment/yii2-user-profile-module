@@ -60,6 +60,23 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= $form->field($model, 'phone')->textInput(['maxlength' => 20, 'autocomplete' => 'off', 'placeholder' => Yii::$app->getModule('user-profile')->phonePlaceholder]) ?>
 
+    <?= $form->field($model, 'comment')->textarea(['maxlength' => 500]) ?>
+
+    <div class="row">
+        <div class="col-6 col-sm-12 col-md-6">
+            <?= $form->field($model, 'vk')->textInput(['maxlength' => 100, 'autocomplete' => 'off']) ?>
+            <?= $form->field($model, 'ok')->textInput(['maxlength' => 100, 'autocomplete' => 'off']) ?>
+            <?= $form->field($model, 'telegram')->textInput(['maxlength' => 100, 'autocomplete' => 'off']) ?>
+            <?= $form->field($model, 'whatsapp')->textInput(['maxlength' => 100, 'autocomplete' => 'off']) ?>
+        </div>
+        <div class="col-6 col-sm-12 col-md-6">
+            <?= $form->field($model, 'viber')->textInput(['maxlength' => 100, 'autocomplete' => 'off']) ?>
+            <?= $form->field($model, 'youtube')->textInput(['maxlength' => 100, 'autocomplete' => 'off']) ?>
+            <?= $form->field($model, 'twitter')->textInput(['maxlength' => 100, 'autocomplete' => 'off']) ?>
+            <?= $form->field($model, 'facebook')->textInput(['maxlength' => 100, 'autocomplete' => 'off']) ?>
+        </div>
+    </div>
+
     <?= $form->field($model, 'captcha')->widget(Captcha::className(), [
         'template' => '<div class="row"><div class="col-sm-2">{image}</div><div class="col-sm-3">{input}</div></div>',
         'captchaAction' => ['/user-management/auth/captcha']

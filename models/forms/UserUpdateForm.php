@@ -8,6 +8,7 @@ use webvimark\modules\UserManagement\models\User;
 use webvimark\modules\UserManagement\UserManagementModule;
 use yii\base\Model;
 use Yii;
+use yii\helpers\Html;
 use yii\web\UploadedFile;
 use yii\helpers\Url;
 
@@ -32,6 +33,20 @@ class UserUpdateForm extends Model
     public $dob;
     public $phone;
     public $sex;
+    public $comment;
+    public $job;
+    public $social;
+
+    public $vk;
+    public $ok;
+
+    public $telegram;
+    public $whatsapp;
+    public $viber;
+
+    public $youtube;
+    public $twitter;
+    public $facebook;
 
     /**
      * @inheritdoc
@@ -42,7 +57,7 @@ class UserUpdateForm extends Model
             ['username', 'required'],
             ['username', 'validateUsername'],
             ['username', 'trim'],
-            [['id', 'status', 'email_confirmed', 'attempts'], 'integer'],
+            [['id', 'status', 'email_confirmed', 'attempts', 'job'], 'integer'],
             ['blocked_at', 'validateBlockedAt'],
             ['blocked_for', 'validateBlockedFor'],
             ['attempts', 'default', 'value' => 0],
@@ -60,7 +75,21 @@ class UserUpdateForm extends Model
             [['firstname', 'lastname', 'patronymic'], 'validateName'],
             [['firstname', 'lastname', 'patronymic'], 'string', 'min' => 2, 'max' => 100],
             [['avatar'], 'string', 'max' => 100],
+            ['comment', 'string', 'max' => 500],
+            ['comment', 'purgeXSS'],
+            ['social', 'string', 'max' => 1000],
+            [['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'string', 'max' => 100],
         ];
+    }
+
+    /**
+     * Remove possible XSS stuff
+     *
+     * @param $attribute
+     */
+    public function purgeXSS($attribute)
+    {
+        $this->$attribute = Html::encode($this->$attribute);
     }
 
     public function validateUsername()
@@ -194,6 +223,17 @@ class UserUpdateForm extends Model
             'dob' => UserProfileModule::t('front', 'Dob'),
             'phone' => UserProfileModule::t('front', 'Phone'),
             'sex' => UserProfileModule::t('front', 'Sex'),
+            'comment' => UserProfileModule::t('front', 'Comment'),
+            'job' => UserProfileModule::t('front', 'Job'),
+            'social' => UserProfileModule::t('front', 'Social'),
+            'vk' => UserProfileModule::t('front', 'Vk'),
+            'ok' => UserProfileModule::t('front', 'Ok'),
+            'telegram' => UserProfileModule::t('front', 'Telegram'),
+            'whatsapp' => UserProfileModule::t('front', 'Whatsapp'),
+            'viber' => UserProfileModule::t('front', 'Viber'),
+            'youtube' => UserProfileModule::t('front', 'Youtube'),
+            'twitter' => UserProfileModule::t('front', 'Twitter'),
+            'facebook' => UserProfileModule::t('front', 'Facebook')
         ];
     }
 

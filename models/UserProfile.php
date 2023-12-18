@@ -6,6 +6,7 @@ use chieff\helpers\SecurityHelper;
 use chieff\modules\UserProfile\UserProfileModule;
 use Yii;
 use webvimark\modules\UserManagement\models\User;
+use yii\helpers\Html;
 use yii\helpers\Url;
 
 /**
@@ -20,6 +21,9 @@ use yii\helpers\Url;
  * @property int $dob
  * @property string $phone
  * @property int $sex
+ * @property string $comment
+ * @property string $job
+ * @property string $social
  */
 class UserProfile extends \yii\db\ActiveRecord
 {
@@ -38,14 +42,28 @@ class UserProfile extends \yii\db\ActiveRecord
     {
         return [
             [['user_id', 'firstname', 'lastname', 'patronymic', 'dob', 'phone', 'sex'], 'required'],
-            [['user_id', 'sex'], 'integer'],
+            [['user_id', 'sex', 'job'], 'integer'],
             ['dob', 'validateDob'],
             ['phone', 'validatePhone'],
             [['phone'], 'string', 'max' => 20],
             [['firstname', 'lastname', 'patronymic'], 'validateName'],
             [['firstname', 'lastname', 'patronymic'], 'string', 'min' => 2, 'max' => 100],
             [['avatar'], 'string', 'max' => 100],
+            [['comment'], 'string', 'max' => 500],
+            ['comment', 'purgeXSS'],
+            [['social'], 'string', 'max' => 1000],
         ];
+    }
+
+
+    /**
+     * Remove possible XSS stuff
+     *
+     * @param $attribute
+     */
+    public function purgeXSS($attribute)
+    {
+        $this->$attribute = Html::encode($this->$attribute);
     }
 
     public function validateDob()
@@ -101,6 +119,9 @@ class UserProfile extends \yii\db\ActiveRecord
             'dob' => UserProfileModule::t('front', 'Dob'),
             'phone' => UserProfileModule::t('front', 'Phone'),
             'sex' => UserProfileModule::t('front', 'Sex'),
+            'comment' => UserProfileModule::t('front', 'Comment'),
+            'job' => UserProfileModule::t('front', 'Job'),
+            'social' => UserProfileModule::t('front', 'Social'),
         ];
     }
 
@@ -178,6 +199,33 @@ class UserProfile extends \yii\db\ActiveRecord
             unlink($path);
         }
         return parent::beforeDelete();
+    }
+
+    public function getSocialStringFromArray($model)
+    {
+        $social = ['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'];
+        $social_links = [];
+        foreach ($social as $soc) {
+            if ($model->$soc) {
+                $social_links[] = $soc . '%^&*(:' . $model->$soc;
+            }
+        }
+        if ($social_links) {
+            return implode(',', $social_links);
+        }
+        return '';
+    }
+
+    public function getSocialFromStringByName($string, $name)
+    {
+        $social_cur = explode(',', $string);
+        if ($social_cur) {
+            $social_res = preg_grep('/^' . $name . '\%\^\&\*\(:/U', $social_cur);
+            if ($social_res) {
+                $social_res = implode('', $social_res);
+                return str_replace($name . '%^&*(:', '', $social_res);
+            }
+        }
     }
 
 }

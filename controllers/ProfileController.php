@@ -61,6 +61,11 @@ class ProfileController extends \webvimark\components\BaseController
                 $profile->dob = $model->dob;
                 $profile->phone = $model->phone;
                 $profile->sex = $model->sex;
+                $profile->comment = $model->comment;
+                $profile->job = $model->job;
+
+                $profile->social = $profile->getSocialStringFromArray($model);
+
                 $profile->save();
 
                 return $redirect === false ? '' : $this->redirect(['/user-management/user/view', 'id' => $user->id]);
@@ -84,6 +89,16 @@ class ProfileController extends \webvimark\components\BaseController
             $model->dob = $profile->dob;
             $model->phone = $profile->phone;
             $model->sex = $profile->sex;
+            $model->comment = $profile->comment;
+            $model->job = $profile->job;
+
+            $social = ['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'];
+            foreach ($social as $soc) {
+                $social_res = $profile->getSocialFromStringByName($profile->social, $soc);
+                if ($social_res) {
+                    $model->$soc = $social_res;
+                }
+            }
 
         }
 
