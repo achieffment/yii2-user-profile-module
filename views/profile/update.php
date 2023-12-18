@@ -18,7 +18,7 @@ use kartik\date\DatePicker;
 
 $this->title = UserManagementModule::t('back', 'Editing user: ') . ' ' . $model->username;
 $this->params['breadcrumbs'][] = ['label' => UserManagementModule::t('back', 'Users'), 'url' => ['/user-management/user/index']];
-$this->params['breadcrumbs'][] = ['label' => $model->username, 'url' => ['/user-management/user/view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = ['label' => $model->username, 'url' => [Yii::$app->getModule('user-management')->userViewPath ? Yii::$app->getModule('user-management')->userViewPath : '/user-management/user/view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = UserManagementModule::t('back', 'Editing');
 ?>
 <div class="user-update">

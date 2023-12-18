@@ -14,7 +14,7 @@ use yii\widgets\DetailView;
  */
 
 $this->title = $model->username;
-$this->params['breadcrumbs'][] = ['label' => UserManagementModule::t('back', 'Users'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => UserManagementModule::t('back', 'Users'), 'url' => ['/user-management/user/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="user-view">
