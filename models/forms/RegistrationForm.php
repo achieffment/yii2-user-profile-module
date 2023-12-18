@@ -85,7 +85,6 @@ class RegistrationForm extends \webvimark\modules\UserManagement\models\forms\Re
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'id' => 'ID',
             'user_id' => UserProfileModule::t('front', 'User ID'),
             'avatar' => UserProfileModule::t('front', 'Avatar'),
             'avatar_file' => UserProfileModule::t('front', 'Avatar'),
@@ -105,38 +104,33 @@ class RegistrationForm extends \webvimark\modules\UserManagement\models\forms\Re
             $this->avatar_file &&
             $this->validate('avatar_file')
         ) {
-            $file_alias = '@webroot';
-            $file_folder = '/uploads/avatars/';
-
-            $file_folder_path = Yii::getAlias($file_alias . $file_folder);
-            if (!is_dir($file_folder_path)) {
-                if (!mkdir($file_folder_path, 0777, true)) {
+            $path = Yii::$app->getModule('user-profile')->avatarPath;
+            $path = Yii::getAlias($path);
+            if (!is_dir($path)) {
+                if (!mkdir($path, 0777, true)) {
                     return '';
                 }
             }
-
             $file_name = 'avatar_' . $user_id . '.' . $this->avatar_file->getExtension();
-
-            $file_full_path = $file_folder_path . $file_name;
-            $file_alias_full_path = $file_alias . $file_folder . $file_name;
-
-            if ($this->avatar_file->saveAs($file_alias_full_path)) {
-                if (Yii::$app->getModule('user-profile')->encodeAvatar) {
-                    $data = file_get_contents($file_full_path);
+            $file_path = $path . $file_name;
+            if ($this->avatar_file->saveAs($file_path)) {
+                if (
+                    Yii::$app->getModule('user-profile')->avatarEncode &&
+                    (($data = file_get_contents($file_path)) !== false)
+                ) {
                     $data = SecurityHelper::encode($data, 'aes-256-ctr', Yii::$app->getModule('user-profile')->passphrase);
                     if ($data) {
-                        if (file_put_contents($file_full_path, $data) === false) {
-                            unset($file_full_path);
+                        if (file_put_contents($file_path, $data) === false) {
+                            unlink($file_path);
                             return '';
                         }
                     } else {
-                        unset($file_full_path);
+                        unlink($file_path);
                         return '';
                     }
                 }
-                return $file_folder . $file_name;
+                return $file_name;
             }
-
             return '';
         }
         return '';

@@ -45,7 +45,10 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $form->field($model, 'patronymic')->textInput(['maxlength' => 100, 'autocomplete' => 'off']) ?>
 
     <?= $form->field($model, 'dob')->widget(DatePicker::classname(), [
-        'options' => ['placeholder' => UserProfileModule::t('front', 'Enter dob')],
+        'options' => [
+            'value' => $model->dob ? (is_numeric($model->dob) ? date('d-m-Y', $model->dob) : $model->dob) : null,
+            'placeholder' => UserProfileModule::t('front', 'Enter dob')
+        ],
         'pluginOptions' => [
             'todayBtn' => true,
             'todayHighlight' => true,

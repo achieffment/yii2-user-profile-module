@@ -11,7 +11,9 @@ class UserProfileModule extends \yii\base\Module
      *
      * @var bool
      */
-    public $encodeAvatar = false;
+    public $avatarEncode = false;
+
+    public $avatarPath = '@webroot/uploads/avatars/';
 
     /**
      * Passphrase for encoding
