@@ -39,7 +39,6 @@ class ProfileController extends \webvimark\components\BaseController
         if ($model->load(Yii::$app->request->post())) {
 
             if ($model->validate()) {
-
                 $user->status = $model->status;
                 $user->username = $model->username;
                 if (User::hasPermission('bindUserToIp')) {
@@ -63,12 +62,8 @@ class ProfileController extends \webvimark\components\BaseController
                 $profile->sex = $model->sex;
                 $profile->save();
 
-//                $redirect = $this->getRedirectPage('update', $model);
-//                return $redirect === false ? '' : $this->redirect($redirect);
-                exit('ok');
+                return $redirect === false ? '' : $this->redirect(['/user-management/user/view', 'id' => $user->id]);
             }
-
-            // smth went wrong
 
         } else {
 

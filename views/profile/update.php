@@ -17,8 +17,8 @@ use kartik\date\DatePicker;
  */
 
 $this->title = UserManagementModule::t('back', 'Editing user: ') . ' ' . $model->username;
-$this->params['breadcrumbs'][] = ['label' => UserManagementModule::t('back', 'Users'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->username, 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = ['label' => UserManagementModule::t('back', 'Users'), 'url' => ['/user-management/user/index']];
+$this->params['breadcrumbs'][] = ['label' => $model->username, 'url' => ['/user-management/user/view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = UserManagementModule::t('back', 'Editing');
 ?>
 <div class="user-update">
@@ -78,7 +78,9 @@ $this->params['breadcrumbs'][] = UserManagementModule::t('back', 'Editing');
                                 $date = $model->blocked_at;
                                 if (!is_numeric($date)) {
                                     $date = strtotime($date);
-                                    $date += $blockTime;
+                                    if ($date !== false) {
+                                        $date += $blockTime;
+                                    }
                                 }
                             ?>
                             <?= date("d-m-Y H:i", $date) ?> (<?= $blockTime / 60 / 60 ?> <?= UserManagementModule::t('back', 'Hours') ?>)
