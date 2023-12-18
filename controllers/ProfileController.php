@@ -50,6 +50,7 @@ class ProfileController extends \webvimark\components\BaseController
                 }
                 $user->attempts = $model->attempts;
                 $user->blocked_at = $model->blocked_at;
+                $user->blocked_for = $model->blocked_for;
                 $user->save();
 
                 $profile->user_id = $id;
@@ -74,6 +75,7 @@ class ProfileController extends \webvimark\components\BaseController
             $model->email_confirmed = $user->email_confirmed;
             $model->attempts = $user->attempts;
             $model->blocked_at = $user->blocked_at;
+            $model->blocked_for = $user->blocked_for;
 
             $model->avatar = $profile->avatar;
             $model->firstname = $profile->firstname;

@@ -19,6 +19,7 @@ class UserUpdateForm extends Model
     public $status;
     public $attempts;
     public $blocked_at;
+    public $blocked_for;
     public $bind_to_ip;
     public $email;
     public $email_confirmed;
@@ -43,6 +44,7 @@ class UserUpdateForm extends Model
             ['username', 'trim'],
             [['id', 'status', 'email_confirmed', 'attempts'], 'integer'],
             ['blocked_at', 'validateBlockedAt'],
+            ['blocked_for', 'validateBlockedFor'],
             ['attempts', 'default', 'value' => 0],
             ['email', 'email'],
             ['email', 'validateEmailConfirmedUnique'],
@@ -73,10 +75,26 @@ class UserUpdateForm extends Model
 
     public function validateBlockedAt()
     {
-        if ($this->blocked_at) {
+        if (
+            $this->blocked_at &&
+            !is_numeric($this->blocked_at)
+        ) {
             $date = strtotime($this->blocked_at);
             if ($date === false) {
                 $this->addError('blocked_at', UserManagementModule::t('front', 'Incorrect blocked at date'));
+            }
+        }
+    }
+
+    public function validateBlockedFor()
+    {
+        if (
+            $this->blocked_for &&
+            !is_numeric($this->blocked_for)
+        ) {
+            $date = strtotime($this->blocked_for);
+            if ($date === false) {
+                $this->addError('blocked_for', UserManagementModule::t('front', 'Incorrect blocked for date'));
             }
         }
     }
@@ -166,6 +184,7 @@ class UserUpdateForm extends Model
             'email_confirmed' => UserManagementModule::t('back', 'E-mail confirmed'),
             'attempts' => UserManagementModule::t('back', 'Attempts'),
             'blocked_at' => UserManagementModule::t('back', 'Blocked at'),
+            'blocked_for' => UserManagementModule::t('back', 'Blocked for'),
             'email' => UserManagementModule::t('back', 'E-mail'),
             'avatar' => UserProfileModule::t('front', 'Avatar'),
             'avatar_file' => UserProfileModule::t('front', 'Avatar'),

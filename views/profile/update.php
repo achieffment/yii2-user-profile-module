@@ -65,28 +65,18 @@ $this->params['breadcrumbs'][] = UserManagementModule::t('back', 'Editing');
                     ]
                 ]); ?>
 
-                <?
-                $blockTime = Yii::$app->getModule('user-management')->blockAccountTime;
-                if (
-                    $blockTime &&
-                    $model->blocked_at
-                ): ?>
-                    <div class="form-group row">
-                        <?= '<label class="col-sm-2 col-form-label">' . UserManagementModule::t('back', 'Unblock date') . '</label>' ?>
-                        <div class="col-sm-10">
-                            <?
-                                $date = $model->blocked_at;
-                                if (!is_numeric($date)) {
-                                    $date = strtotime($date);
-                                    if ($date !== false) {
-                                        $date += $blockTime;
-                                    }
-                                }
-                            ?>
-                            <?= date("d-m-Y H:i", $date) ?> (<?= $blockTime / 60 / 60 ?> <?= UserManagementModule::t('back', 'Hours') ?>)
-                        </div>
-                    </div>
-                <? endif; ?>
+                <?= $form->field($model, 'blocked_for')->widget(DateTimePicker::classname(), [
+                    'options' => [
+                        'value' => $model->blocked_for ? (is_numeric($model->blocked_for) ? date('d-m-Y H:i', $model->blocked_for) : $model->blocked_for) : null,
+                    ],
+                    'pluginOptions' => [
+                        'todayBtn' => true,
+                        'todayHighlight' => true,
+                        'autoclose' => true,
+                        'format' => 'dd-m-yyyy HH:ii',
+                        'startDate' => date('d-m-Y H:i'),
+                    ]
+                ]); ?>
 
                 <?
                     $avatar = ['showCaption' => false];
