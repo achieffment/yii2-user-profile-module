@@ -90,6 +90,7 @@ $this->params['breadcrumbs'][] = UserManagementModule::t('back', 'Editing');
                     'options' => ['accept' => 'image/*', 'multiple' => false],
                     'pluginOptions' => $avatar
                 ]); ?>
+                <?= $form->field($model, 'avatar_delete')->checkbox(['value' => 0]) ?>
 
                 <?= $form->field($model, 'sex')->dropDownList(Yii::$app->getModule('user-profile')->arraySex) ?>
 

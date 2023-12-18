@@ -37,7 +37,6 @@ class ProfileController extends \webvimark\components\BaseController
         $model->id = $id;
 
         if ($model->load(Yii::$app->request->post())) {
-
             if ($model->validate()) {
                 $user->status = $model->status;
                 $user->username = $model->username;
@@ -54,7 +53,12 @@ class ProfileController extends \webvimark\components\BaseController
                 $user->save();
 
                 $profile->user_id = $id;
-                $profile->avatar = $model->avatarUpload($id);
+                if ($model->avatar_delete) {
+                    $profile->avatar = '';
+                } else {
+                    $profile->avatar = $model->avatarUpload($id, $profile->avatar);
+                }
+
                 $profile->firstname = $model->firstname;
                 $profile->lastname = $model->lastname;
                 $profile->patronymic = $model->patronymic;
@@ -68,11 +72,10 @@ class ProfileController extends \webvimark\components\BaseController
 
                 $profile->save();
 
-                return $redirect === false ? '' : $this->redirect(['/user-management/user/view', 'id' => $user->id]);
+                $path = Yii::$app->getModule('user-management')->userViewPath ? Yii::$app->getModule('user-management')->userViewPath : 'user-management/user/view';
+                return $redirect === false ? '' : $this->redirect([$path, 'id' => $user->id]);
             }
-
         } else {
-
             $model->status = $user->status;
             $model->username = $user->username;
             $model->bind_to_ip = $user->bind_to_ip;
@@ -99,9 +102,61 @@ class ProfileController extends \webvimark\components\BaseController
                     $model->$soc = $social_res;
                 }
             }
-
         }
 
         return $this->render('update', compact('model'));
+    }
+
+    public function actionView($id)
+    {
+        $this->layout = '//main.php';
+
+        $user = User::findOne(['id' => $id]);
+        if ($user === null) {
+            throw new NotFoundHttpException(Yii::t('yii', 'Page not found.'));
+        }
+
+        $model = new UserUpdateForm();
+        $model->id = $id;
+
+        $model->status = $user->status;
+        $model->username = $user->username;
+        $model->bind_to_ip = $user->bind_to_ip;
+        $model->email = $user->email;
+        $model->email_confirmed = $user->email_confirmed;
+        $model->attempts = $user->attempts;
+        $model->blocked_at = $user->blocked_at;
+        $model->blocked_for = $user->blocked_for;
+
+        $model->registration_ip = $user->registration_ip;
+        $model->created_at = $user->created_at;
+        $model->updated_at = $user->updated_at;
+        $model->created_by = $user->created_by;
+        $model->updated_by = $user->updated_by;
+
+        $profile = UserProfile::findOne(['user_id' => $id]);
+        if ($profile !== null) {
+
+            $model->avatar = $profile->avatar;
+            $model->firstname = $profile->firstname;
+            $model->lastname = $profile->lastname;
+            $model->patronymic = $profile->patronymic;
+            $model->dob = $profile->dob;
+            $model->phone = $profile->phone;
+            $model->sex = $profile->sex;
+            $model->comment = $profile->comment;
+            $model->job = $profile->job;
+
+            $social = ['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'];
+            foreach ($social as $soc) {
+                $social_res = $profile->getSocialFromStringByName($profile->social, $soc);
+                if ($social_res) {
+                    $model->$soc = $social_res;
+                }
+            }
+
+        }
+
+        return $this->render('view', compact('model'));
     }
 }

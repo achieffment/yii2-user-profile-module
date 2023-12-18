@@ -25,8 +25,16 @@ class UserUpdateForm extends Model
     public $email;
     public $email_confirmed;
 
+    public $registration_ip;
+    public $created_at;
+    public $updated_at;
+    public $created_by;
+    public $updated_by;
+
     public $avatar;
     public $avatar_file;
+    public $avatar_delete;
+
     public $firstname;
     public $lastname;
     public $patronymic;
@@ -79,7 +87,8 @@ class UserUpdateForm extends Model
             ['social', 'string', 'max' => 1000],
             [['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'string', 'max' => 100],
             [['firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'trim'],
-            [['firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'purgeXSS']
+            [['firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'purgeXSS'],
+            ['avatar_delete', 'boolean']
         ];
     }
 
@@ -234,7 +243,13 @@ class UserUpdateForm extends Model
             'viber' => UserProfileModule::t('front', 'Viber'),
             'youtube' => UserProfileModule::t('front', 'Youtube'),
             'twitter' => UserProfileModule::t('front', 'Twitter'),
-            'facebook' => UserProfileModule::t('front', 'Facebook')
+            'facebook' => UserProfileModule::t('front', 'Facebook'),
+            'registration_ip' => UserManagementModule::t('back', 'Registration IP'),
+            'created_at' => UserManagementModule::t('back', 'Created'),
+            'updated_at' => UserManagementModule::t('back', 'Updated'),
+            'created_by' => UserManagementModule::t('back', 'Created by'),
+            'updated_by' => UserManagementModule::t('back', 'Updated by'),
+            'avatar_delete' => UserProfileModule::t('front', 'Avatar Delete')
         ];
     }
 
@@ -268,7 +283,7 @@ class UserUpdateForm extends Model
         return $path;
     }
 
-    public function avatarUpload($user_id)
+    public function avatarUpload($user_id, $avatar)
     {
         $this->avatar_file = UploadedFile::getInstance($this, 'avatar_file');
         if (
@@ -304,6 +319,6 @@ class UserUpdateForm extends Model
             }
             return '';
         }
-        return '';
+        return $avatar;
     }
 }
