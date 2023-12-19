@@ -33,8 +33,9 @@ use kartik\date\DatePicker;
     <?= $form->field($model, 'username')->textInput(['maxlength' => 255, 'autocomplete' => 'off']) ?>
 
     <?php if ($model->isNewRecord): ?>
-        <?= $form->field($model, 'password')->passwordInput(['maxlength' => 255, 'autocomplete' => 'off']) ?>
-        <?= $form->field($model, 'repeat_password')->passwordInput(['maxlength' => 255, 'autocomplete' => 'off']) ?>
+        <?= $form->field($model, 'password')->passwordInput(['maxlength' => 255, 'autocomplete' => 'off', 'data-role' => 'password']) ?>
+        <?= $form->field($model, 'repeat_password')->passwordInput(['maxlength' => 255, 'autocomplete' => 'off', 'data-role' => 'password-repeat']) ?>
+        <?= $this->render('_password_generator'); ?>
     <?php endif; ?>
 
     <?php if (User::hasPermission('bindUserToIp')): ?>

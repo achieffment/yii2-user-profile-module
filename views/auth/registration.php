@@ -28,8 +28,9 @@ $this->params['breadcrumbs'][] = $this->title;
         ]
     ]); ?>
     <?= $form->field($model, 'username')->textInput(['maxlength' => 50, 'autocomplete' => 'off', 'autofocus' => true]) ?>
-    <?= $form->field($model, 'password')->passwordInput(['maxlength' => 255, 'autocomplete' => 'off']) ?>
-    <?= $form->field($model, 'repeat_password')->passwordInput(['maxlength' => 255, 'autocomplete' => 'off']) ?>
+    <?= $form->field($model, 'password')->passwordInput(['maxlength' => 255, 'autocomplete' => 'off', 'data-role' => 'password']) ?>
+    <?= $form->field($model, 'repeat_password')->passwordInput(['maxlength' => 255, 'autocomplete' => 'off', 'data-role' => 'password-repeat']) ?>
+    <?= $this->render('../profile/_password_generator') ?>
 
     <?= $form->field($model, 'avatar_file')->widget(FileInput::classname(), [
         'options' => ['accept' => 'image/*', 'multiple' => false],
