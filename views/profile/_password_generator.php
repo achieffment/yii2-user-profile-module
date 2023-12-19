@@ -5,10 +5,11 @@
 <? if (Yii::$app->getModule('user-management')->usePasswordGenerator): ?>
     <div class="form-group">
         <button type="button" class="btn btn-secondary mr-4" data-role="generate"><?= UserManagementModule::t('back', 'Generate password') ?></button>
-        <span class="badge badge-secondary" data-role="generate-value"></span>
+        <span class="badge badge-secondary mr-4" data-role="generate-value"></span>
+        <span class="badge badge-secondary" data-role="notify"><?= UserManagementModule::t('back', 'Copied') ?></span>
     </div>
-    <div class="d-none position-absolute fixed-top alert alert-secondary fade" role="alert" data-role="notify">
-        <?= UserManagementModule::t('back', 'Copied') ?>
+    <div class="d-none position-absolute fixed-top alert alert-secondary fade" role="alert" >
+
     </div>
     <?php
     $passwordLength = Yii::$app->getModule('user-management')->passwordGeneratorLength;
@@ -26,6 +27,7 @@
                 password.value = generated;
                 password_repeat.value = generated;
                 generate_value.innerText = generated;
+                generate_value.click();
             }
             generate_value.onclick = function() {
                 window.getSelection().removeAllRanges();
@@ -39,15 +41,12 @@
                     notify.classList.remove('d-none');
                 }                
                 if (!notify.classList.contains('show')) {
-                    notify.classList.add('show');
                     notify_timeout = setTimeout(function() {
-                        notify.classList.remove('show');
                         notify.classList.add('d-none');
                     }, 1000);
                 } else {
                     clearTimeout(notify_timeout);
                     notify_timeout = setTimeout(function() {
-                        notify.classList.remove('show');
                         notify.classList.add('d-none');
                     }, 1000);
                 }
