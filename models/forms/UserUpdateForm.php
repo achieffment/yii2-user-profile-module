@@ -66,6 +66,9 @@ class UserUpdateForm extends Model
     public function rules()
     {
         return [
+            [['firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'trim'],
+            [['username', 'firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'purgeXSS'],
+
             [['id', 'status', 'email_confirmed', 'attempts', 'job'], 'integer'],
 
             ['username', 'required'],
@@ -103,10 +106,6 @@ class UserUpdateForm extends Model
             ['social', 'string', 'max' => 1000],
 
             [['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'string', 'max' => 100],
-
-            [['firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'trim'],
-            [['username', 'firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'purgeXSS'],
-
 
             ['password', 'required', 'on' => 'newUser'],
             ['password', 'string', 'max' => 255, 'on' => 'newUser'],
@@ -219,17 +218,17 @@ class UserUpdateForm extends Model
     public function validateName()
     {
         if ($this->firstname) {
-            if (preg_match('/[A-Za-zА-Яа-я]{2,}/', $this->firstname) !== 1) {
+            if (preg_match('/^[A-Za-zА-Яа-яЁё]{2,}$/u', $this->firstname) !== 1) {
                 $this->addError('firstname', UserProfileModule::t('front', 'Incorrect firstname'));
             }
         }
         if ($this->lastname) {
-            if (preg_match('/[A-Za-zА-Яа-я]{2,}/', $this->lastname) !== 1) {
+            if (preg_match('/^[A-Za-zА-Яа-яЁё]{2,}$/u', $this->lastname) !== 1) {
                 $this->addError('lastname', UserProfileModule::t('front', 'Incorrect lastname'));
             }
         }
         if ($this->patronymic) {
-            if (preg_match('/[A-Za-zА-Яа-я]{2,}/', $this->patronymic) !== 1) {
+            if (preg_match('/^[A-Za-zА-Яа-яЁё]{2,}$/u', $this->patronymic) !== 1) {
                 $this->addError('patronymic', UserProfileModule::t('front', 'Incorrect patronymic'));
             }
         }

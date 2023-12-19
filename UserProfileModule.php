@@ -44,6 +44,8 @@ class UserProfileModule extends \yii\base\Module
         8 => 'Старший программист',
     ];
 
+    public $dataEncode = false;
+
     public $controllerNamespace = 'chieff\modules\UserProfile\controllers';
 
     /**

@@ -41,6 +41,8 @@ class UserProfile extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['firstname', 'lastname', 'patronymic', 'comment'], 'trim'],
+            [['firstname', 'lastname', 'patronymic', 'comment'], 'purgeXSS'],
             [['user_id', 'firstname', 'lastname', 'patronymic', 'dob', 'phone', 'sex'], 'required'],
             [['user_id', 'sex', 'job'], 'integer'],
             ['dob', 'validateDob'],
@@ -51,8 +53,6 @@ class UserProfile extends \yii\db\ActiveRecord
             [['avatar'], 'string', 'max' => 100],
             [['comment'], 'string', 'max' => 500],
             [['social'], 'string', 'max' => 1000],
-            [['firstname', 'lastname', 'patronymic', 'comment'], 'trim'],
-            [['firstname', 'lastname', 'patronymic', 'comment'], 'purgeXSS']
         ];
     }
 
@@ -89,17 +89,17 @@ class UserProfile extends \yii\db\ActiveRecord
     public function validateName()
     {
         if ($this->firstname) {
-            if (preg_match('/[A-Za-zА-Яа-я]{2,}/', $this->firstname) !== 1) {
+            if (preg_match('/^[A-Za-zА-Яа-яЁё]{2,}$/u', $this->firstname) !== 1) {
                 $this->addError('firstname', UserProfileModule::t('front', 'Incorrect firstname'));
             }
         }
         if ($this->lastname) {
-            if (preg_match('/[A-Za-zА-Яа-я]{2,}/', $this->lastname) !== 1) {
+            if (preg_match('/^[A-Za-zА-Яа-яЁё]{2,}$/u', $this->lastname) !== 1) {
                 $this->addError('lastname', UserProfileModule::t('front', 'Incorrect lastname'));
             }
         }
         if ($this->patronymic) {
-            if (preg_match('/[A-Za-zА-Яа-я]{2,}/', $this->patronymic) !== 1) {
+            if (preg_match('/^[A-Za-zА-Яа-яЁё]{2,}$/u', $this->patronymic) !== 1) {
                 $this->addError('patronymic', UserProfileModule::t('front', 'Incorrect patronymic'));
             }
         }
@@ -177,6 +177,7 @@ class UserProfile extends \yii\db\ActiveRecord
                 $this->dob = null;
             }
         }
+
         if (
             !$insert &&
             isset($this->oldAttributes['avatar']) &&
@@ -226,6 +227,25 @@ class UserProfile extends \yii\db\ActiveRecord
                 $social_res = implode('', $social_res);
                 return str_replace($name . ':', '', $social_res);
             }
+        }
+    }
+
+    public function getAttributeValue($attribute) {
+        if (
+            Yii::$app->getModule('user-profile')->dataEncode &&
+            $this->$attribute
+        ) {
+            return SecurityHelper::decode($this->$attribute, 'aes-256-ctr', Yii::$app->getModule('user-profile')->passphrase);
+        }
+        return $this->$attribute;
+    }
+
+    public function setAttributeValue($attribute) {
+        if (
+            Yii::$app->getModule('user-profile')->dataEncode &&
+            $this->$attribute
+        ) {
+            $this->$attribute = SecurityHelper::encode($this->$attribute, 'aes-256-ctr', Yii::$app->getModule('user-profile')->passphrase);
         }
     }
 
