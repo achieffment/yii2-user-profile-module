@@ -43,18 +43,26 @@ class RegistrationForm extends \webvimark\modules\UserManagement\models\forms\Re
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
+            ['avatar', 'string', 'max' => 100],
             ['avatar_file', 'file'],
+
             [['firstname', 'lastname', 'patronymic', 'dob', 'phone', 'sex'], 'required'],
+
             [['user_id', 'sex'], 'integer'],
+
             ['dob', 'validateDob'],
             ['phone', 'validatePhone'],
-            [['phone'], 'string', 'max' => 20],
+
+            ['phone', 'string', 'max' => 20],
+
             [['firstname', 'lastname', 'patronymic'], 'validateName'],
             [['firstname', 'lastname', 'patronymic'], 'string', 'min' => 2, 'max' => 100],
-            [['avatar'], 'string', 'max' => 100],
+
             ['comment', 'string', 'max' => 500],
             ['social', 'string', 'max' => 1000],
+
             [['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'string', 'max' => 100],
+
             [['firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'trim'],
             [['firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'purgeXSS']
         ]);

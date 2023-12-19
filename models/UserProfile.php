@@ -208,7 +208,7 @@ class UserProfile extends \yii\db\ActiveRecord
         $social_links = [];
         foreach ($social as $soc) {
             if ($model->$soc) {
-                $social_links[] = $soc . '%^&*(:' . $model->$soc;
+                $social_links[] = $soc . ':' . $model->$soc;
             }
         }
         if ($social_links) {
@@ -221,10 +221,10 @@ class UserProfile extends \yii\db\ActiveRecord
     {
         $social_cur = explode(',', $string);
         if ($social_cur) {
-            $social_res = preg_grep('/^' . $name . '\%\^\&\*\(:/U', $social_cur);
+            $social_res = preg_grep('/^' . $name . ':/U', $social_cur);
             if ($social_res) {
                 $social_res = implode('', $social_res);
-                return str_replace($name . '%^&*(:', '', $social_res);
+                return str_replace($name . ':', '', $social_res);
             }
         }
     }

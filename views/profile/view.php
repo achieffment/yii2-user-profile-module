@@ -22,8 +22,12 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="panel panel-default">
         <div class="panel-body">
             <p>
-                <?= GhostHtml::a(UserManagementModule::t('back', 'Create'), ['/user-management/user/create'], ['class' => 'btn btn-sm btn-success']) ?>
-                <?= GhostHtml::a(UserManagementModule::t('back', 'Edit'), [Yii::$app->getModule('user-management')->userUpdatePath ? Yii::$app->getModule('user-management')->userUpdatePath : '/user-management/user/update', 'id' => $model->id], ['class' => 'btn btn-sm btn-primary']) ?>
+                <?
+                    $userCreatePath = Yii::$app->getModule('user-management')->userCreatePath ? Yii::$app->getModule('user-management')->userCreatePath : '/user-management/user/create';
+                    $userUpdatePath = Yii::$app->getModule('user-management')->userUpdatePath ? Yii::$app->getModule('user-management')->userUpdatePath : '/user-management/user/update';
+                ?>
+                <?= GhostHtml::a(UserManagementModule::t('back', 'Create'), [$userCreatePath], ['class' => 'btn btn-sm btn-success']) ?>
+                <?= GhostHtml::a(UserManagementModule::t('back', 'Edit'), [$userUpdatePath, 'id' => $model->id], ['class' => 'btn btn-sm btn-primary']) ?>
                 <?= GhostHtml::a(
                     UserManagementModule::t('back', 'Roles and permissions'),
                     ['/user-management/user-permission/set', 'id' => $model->id],
@@ -79,7 +83,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         'value' => $model->attempts,
                         'format' => 'raw',
                     ),
-
                     array(
                         'attribute' => 'firstname',
                         'value' => $model->firstname,
@@ -97,7 +100,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ),
                     array(
                         'attribute' => 'dob',
-                        'value' => $model->dob,
+                        'value' => date('d-m-Y', $model->dob),
                         'format' => 'raw',
                     ),
                     array(
@@ -113,13 +116,21 @@ $this->params['breadcrumbs'][] = $this->title;
                                 }
                                 return $model->phone;
                             }
-                            return '';
                         },
                         'format' => 'raw',
                     ),
                     array(
                         'attribute' => 'sex',
-                        'value' => $model->sex,
+                        'value' => function($model) {
+                            if (
+                                is_numeric($model->sex) &&
+                                isset(Yii::$app->getModule('user-profile')->arraySex[$model->sex])
+                            ) {
+                                return Yii::$app->getModule('user-profile')->arraySex[$model->sex];
+                            } else if (is_numeric($model->sex)) {
+                                return $model->sex;
+                            }
+                        },
                         'format' => 'raw',
                     ),
                     array(
@@ -129,10 +140,18 @@ $this->params['breadcrumbs'][] = $this->title;
                     ),
                     array(
                         'attribute' => 'job',
-                        'value' => $model->job,
+                        'value' => function($model) {
+                            if (
+                                is_numeric($model->job) &&
+                                isset(Yii::$app->getModule('user-profile')->arrayJob[$model->job])
+                            ) {
+                                return Yii::$app->getModule('user-profile')->arrayJob[$model->job];
+                            } else if (is_numeric($model->job)) {
+                                return $model->job;
+                            }
+                        },
                         'format' => 'raw',
                     ),
-
                     array(
                         'attribute' => 'vk',
                         'value' => function($model) {
@@ -144,7 +163,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             } else if ($model->vk) {
                                 return $model->vk;
                             }
-                            return '';
                         },
                         'format' => 'raw',
                     ),
@@ -159,7 +177,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             } else if ($model->ok) {
                                 return $model->ok;
                             }
-                            return '';
                         },
                         'format' => 'raw',
                     ),
@@ -174,7 +191,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             } else if ($model->telegram) {
                                 return $model->telegram;
                             }
-                            return '';
                         },
                         'format' => 'raw',
                     ),
@@ -189,7 +205,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             } else if ($model->whatsapp) {
                                 return $model->whatsapp;
                             }
-                            return '';
                         },
                         'format' => 'raw',
                     ),
@@ -204,7 +219,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             } else if ($model->viber) {
                                 return $model->viber;
                             }
-                            return '';
                         },
                         'format' => 'raw',
                     ),
@@ -219,7 +233,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             } else if ($model->youtube) {
                                 return $model->youtube;
                             }
-                            return '';
                         },
                         'format' => 'raw',
                     ),
@@ -234,7 +247,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             } else if ($model->twitter) {
                                 return $model->twitter;
                             }
-                            return '';
                         },
                         'format' => 'raw',
                     ),
@@ -249,7 +261,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             } else if ($model->facebook) {
                                 return $model->facebook;
                             }
-                            return '';
                         },
                         'format' => 'raw',
                     ),
@@ -260,19 +271,17 @@ $this->params['breadcrumbs'][] = $this->title;
                             if ($model->avatar) {
                                 return Html::img($model->getAvatar(), ['style' => 'max-height: 300px']);
                             }
-                            return '';
                         },
                         'format' => 'raw',
                     ),
-
                     array(
                         'attribute' => 'blocked_at',
-                        'value' => $model->blocked_at ? date('d-m-Y H:i', $model->blocked_at) : '',
+                        'value' => $model->blocked_at ? date('d-m-Y H:i', $model->blocked_at) : null,
                         'format' => 'raw',
                     ),
                     array(
                         'attribute' => 'blocked_for',
-                        'value' => $model->blocked_for ? date('d-m-Y H:i', $model->blocked_for) : '',
+                        'value' => $model->blocked_for ? date('d-m-Y H:i', $model->blocked_for) : null,
                         'format' => 'raw',
                     ),
                     'created_at:datetime',
@@ -283,11 +292,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             if ($model->created_by) {
                                 $user = User::findByIdSelectUsername($model->created_by);
                                 if ($user) {
-                                    return Html::a($user['username'], ['/user-management/user/view', 'id' => $model->created_by], ['data-pjax' => 0]);
+                                    return Html::a($user['username'], [Yii::$app->getModule('user-management')->userViewPath ? Yii::$app->getModule('user-management')->userViewPath : '/user-management/user/view', 'id' => $model->created_by], ['data-pjax' => 0]);
                                 }
                                 return $model->created_by;
                             }
-                            return '';
                         },
                         'format' => 'raw',
                     ],
@@ -297,11 +305,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             if ($model->updated_by) {
                                 $user = User::findByIdSelectUsername($model->updated_by);
                                 if ($user) {
-                                    return Html::a($user['username'], ['/user-management/user/view', 'id' => $model->updated_by], ['data-pjax' => 0]);
+                                    return Html::a($user['username'], [Yii::$app->getModule('user-management')->userViewPath ? Yii::$app->getModule('user-management')->userViewPath : '/user-management/user/view', 'id' => $model->updated_by], ['data-pjax' => 0]);
                                 }
                                 return $model->updated_by;
                             }
-                            return '';
                         },
                         'format' => 'raw',
                     ],

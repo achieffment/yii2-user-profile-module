@@ -14,6 +14,7 @@ use yii\helpers\Url;
 
 class UserUpdateForm extends Model
 {
+    public $isNewRecord;
 
     public $id;
     public $username;
@@ -24,6 +25,9 @@ class UserUpdateForm extends Model
     public $bind_to_ip;
     public $email;
     public $email_confirmed;
+
+    public $password;
+    public $repeat_password;
 
     public $registration_ip;
     public $created_at;
@@ -62,33 +66,54 @@ class UserUpdateForm extends Model
     public function rules()
     {
         return [
+            [['id', 'status', 'email_confirmed', 'attempts', 'job'], 'integer'],
+
             ['username', 'required'],
             ['username', 'validateUsername'],
             ['username', 'trim'],
-            [['id', 'status', 'email_confirmed', 'attempts', 'job'], 'integer'],
+
             ['blocked_at', 'validateBlockedAt'],
             ['blocked_for', 'validateBlockedFor'],
-            ['attempts', 'default', 'value' => 0],
+
             ['email', 'email'],
             ['email', 'validateEmailConfirmedUnique'],
+
             ['bind_to_ip', 'validateBindToIp'],
             ['bind_to_ip', 'trim'],
             ['bind_to_ip', 'string', 'max' => 255],
-            ['avatar_file', 'file'],
+
+            ['attempts', 'default', 'value' => 0],
+
             [['firstname', 'lastname', 'patronymic', 'dob', 'phone', 'sex'], 'required'],
-            [['sex'], 'integer'],
-            ['dob', 'validateDob'],
-            ['phone', 'validatePhone'],
-            [['phone'], 'string', 'max' => 20],
+
             [['firstname', 'lastname', 'patronymic'], 'validateName'],
             [['firstname', 'lastname', 'patronymic'], 'string', 'min' => 2, 'max' => 100],
-            [['avatar'], 'string', 'max' => 100],
+
+            ['sex', 'integer'],
+            ['dob', 'validateDob'],
+
+            ['phone', 'validatePhone'],
+            ['phone', 'string', 'max' => 20],
+
+            ['avatar', 'string', 'max' => 100],
+            ['avatar_file', 'file'],
+            ['avatar_delete', 'boolean'],
+
             ['comment', 'string', 'max' => 500],
             ['social', 'string', 'max' => 1000],
+
             [['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'string', 'max' => 100],
+
             [['firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'trim'],
-            [['firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'purgeXSS'],
-            ['avatar_delete', 'boolean']
+            [['username', 'firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'purgeXSS'],
+
+
+            ['password', 'required', 'on' => 'newUser'],
+            ['password', 'string', 'max' => 255, 'on' => 'newUser'],
+            ['password', 'trim', 'on' => 'newUser'],
+            ['password', 'match', 'pattern' => Yii::$app->getModule('user-management')->passwordRegexp, 'on' => 'newUser'],
+            ['repeat_password', 'required', 'on' => 'newUser'],
+            ['repeat_password', 'compare', 'compareAttribute' => 'password', 'on' => 'newUser'],
         ];
     }
 
@@ -249,7 +274,9 @@ class UserUpdateForm extends Model
             'updated_at' => UserManagementModule::t('back', 'Updated'),
             'created_by' => UserManagementModule::t('back', 'Created by'),
             'updated_by' => UserManagementModule::t('back', 'Updated by'),
-            'avatar_delete' => UserProfileModule::t('front', 'Avatar Delete')
+            'avatar_delete' => UserProfileModule::t('front', 'Avatar Delete'),
+            'password' => UserManagementModule::t('back', 'Password'),
+            'repeat_password' => UserManagementModule::t('back', 'Repeat password'),
         ];
     }
 
