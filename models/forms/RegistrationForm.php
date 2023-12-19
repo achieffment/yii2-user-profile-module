@@ -14,9 +14,9 @@ use yii\web\UploadedFile;
 
 class RegistrationForm extends \webvimark\modules\UserManagement\models\forms\RegistrationForm
 {
-    public $user_id;
     public $avatar;
     public $avatar_file;
+
     public $firstname;
     public $lastname;
     public $patronymic;
@@ -24,6 +24,7 @@ class RegistrationForm extends \webvimark\modules\UserManagement\models\forms\Re
     public $phone;
     public $sex;
     public $comment;
+    public $job;
     public $social;
 
     public $vk;
@@ -43,28 +44,44 @@ class RegistrationForm extends \webvimark\modules\UserManagement\models\forms\Re
     public function rules()
     {
         return ArrayHelper::merge(parent::rules(), [
-            [['firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'trim'],
-            [['firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'purgeXSS'],
 
-            ['avatar', 'string', 'max' => 100],
-            ['avatar_file', 'file'],
+            // Encoded user
+            [['firstname', 'lastname', 'patronymic', 'dob', 'phone', 'sex'], 'required', 'on' => 'encodedUser'],
+            ['avatar', 'string','max' => 100, 'on' => 'encodedUser'],
+            ['avatar_file', 'file', 'on' => 'encodedUser'],
+            [['firstname', 'lastname', 'patronymic', 'comment'], 'trim', 'on' => 'encodedUser'],
+            [['firstname', 'lastname', 'patronymic', 'comment'], 'purgeXSS', 'on' => 'encodedUser'],
+            [['firstname', 'lastname', 'patronymic'], 'validateName', 'on' => 'encodedUser'],
+            [['firstname', 'lastname', 'patronymic'], 'string', 'min' => 2, 'max' => 300, 'on' => 'encodedUser'],
+            ['comment', 'string', 'max' => 1500, 'on' => 'encodedUser'],
+            ['dob', 'validateDob', 'on' => 'encodedUser'],
+            ['dob', 'string', 'max' => 30, 'on' => 'encodedUser'],
+            ['phone', 'validatePhone', 'on' => 'encodedUser'],
+            ['phone', 'string', 'max' => 60, 'on' => 'encodedUser'],
+            [['job', 'sex'], 'string', 'max' => 10, 'on' => 'encodedUser'],
+            [['job', 'sex'], 'validateJobSex', 'on' => 'encodedUser'],
+            ['social', 'string', 'max' => 3000, 'on' => 'encodedUser'],
+            [['firstname', 'lastname', 'patronymic', 'dob', 'phone', 'sex', 'comment', 'job', 'social'], 'validateEncode', 'on' => 'encodedUser'],
+            [['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'trim', 'on' => 'encodedUser'],
+            [['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'purgeXSS', 'on' => 'encodedUser'],
+            [['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'string', 'max' => 300, 'on' => 'encodedUser'],
+            [['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'validateEncode', 'on' => 'encodedUser'],
 
-            [['firstname', 'lastname', 'patronymic', 'dob', 'phone', 'sex'], 'required'],
-
-            [['user_id', 'sex'], 'integer'],
-
-            ['dob', 'validateDob'],
-            ['phone', 'validatePhone'],
-
-            ['phone', 'string', 'max' => 20],
-
-            [['firstname', 'lastname', 'patronymic'], 'validateName'],
-            [['firstname', 'lastname', 'patronymic'], 'string', 'min' => 2, 'max' => 100],
-
-            ['comment', 'string', 'max' => 500],
-            ['social', 'string', 'max' => 1000],
-
-            [['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'string', 'max' => 100],
+            // Default user
+            [['firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'trim', 'on' => 'defaultUser'],
+            [['firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'purgeXSS', 'on' => 'defaultUser'],
+            [['firstname', 'lastname', 'patronymic', 'dob', 'phone', 'sex'], 'required', 'on' => 'defaultUser'],
+            [['firstname', 'lastname', 'patronymic'], 'validateName', 'on' => 'defaultUser'],
+            [['firstname', 'lastname', 'patronymic'], 'string', 'min' => 2, 'max' => 100, 'on' => 'defaultUser'],
+            ['avatar', 'string', 'max' => 100, 'on' => 'defaultUser'],
+            ['avatar_file', 'file', 'on' => 'defaultUser'],
+            ['sex', 'integer', 'on' => 'defaultUser'],
+            ['dob', 'validateDob', 'on' => 'defaultUser'],
+            ['phone', 'validatePhone', 'on' => 'defaultUser'],
+            ['phone', 'string', 'max' => 20, 'on' => 'defaultUser'],
+            ['comment', 'string', 'max' => 500, 'on' => 'defaultUser'],
+            ['social', 'string', 'max' => 1000, 'on' => 'defaultUser'],
+            [['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'string', 'max' => 100, 'on' => 'defaultUser'],
         ]);
     }
 
@@ -116,13 +133,73 @@ class RegistrationForm extends \webvimark\modules\UserManagement\models\forms\Re
         }
     }
 
+    public function validateJobSex($attribute)
+    {
+        if (
+            ($this->$attribute != '' && $this->$attribute != null) &&
+            !is_numeric($this->$attribute)
+        ) {
+            $this->addError($attribute, UserProfileModule::t('front', 'Smth went wrong'));
+        }
+    }
+
+    public function validateEncode($attribute)
+    {
+        if (
+            Yii::$app->getModule('user-profile')->dataEncode &&
+            ($this->$attribute != '' && $this->$attribute != null)
+        ) {
+            $value = SecurityHelper::encode($this->$attribute, 'aes-256-ctr', Yii::$app->getModule('user-profile')->passphrase);
+            if (!$value) {
+                $this->addError($attribute, UserProfileModule::t('front', 'Smth went wrong'));
+            } else {
+                $length = mb_strlen($value);
+                if (
+                    ($attribute == 'firstname' || $attribute == 'lastname' || $attribute == 'patronymic') &&
+                    ($length > 300)
+                ) {
+                    $this->addError($attribute, UserProfileModule::t('front', 'Max exception'));
+                } else if (
+                    ($attribute == 'comment') &&
+                    ($length > 1500)
+                ) {
+                    $this->addError($attribute, UserProfileModule::t('front', 'Max exception'));
+                } else if (
+                    ($attribute == 'social') &&
+                    ($length > 3000)
+                ) {
+                    $this->addError($attribute, UserProfileModule::t('front', 'Max exception'));
+                } else if (
+                    ($attribute == 'dob') &&
+                    ($length > 30)
+                ) {
+                    $this->addError($attribute, UserProfileModule::t('front', 'Smth went wrong'));
+                } else if (
+                    ($attribute == 'phone') &&
+                    ($length > 60)
+                ) {
+                    $this->addError($attribute, UserProfileModule::t('front', 'Smth went wrong'));
+                } else if (
+                    ($attribute == 'sex' || $attribute == 'job') &&
+                    ($length > 10)
+                ) {
+                    $this->addError($attribute, UserProfileModule::t('front', 'Smth went wrong'));
+                } else if (
+                    in_array($attribute, ['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook']) &&
+                    ($length > 300)
+                ) {
+                    $this->addError($attribute, UserProfileModule::t('front', 'Max exception'));
+                }
+            }
+        }
+    }
+
     /**
      * @return array
      */
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'user_id' => UserProfileModule::t('front', 'User ID'),
             'avatar' => UserProfileModule::t('front', 'Avatar'),
             'avatar_file' => UserProfileModule::t('front', 'Avatar'),
             'firstname' => UserProfileModule::t('front', 'Firstname'),
@@ -190,7 +267,11 @@ class RegistrationForm extends \webvimark\modules\UserManagement\models\forms\Re
      */
     protected function saveProfile($user)
     {
-        $model = new UserProfile();
+        if (Yii::$app->getModule('user-profile')->dataEncode) {
+            $model = new UserProfile(['scenario' => 'encodedUser']);
+        } else {
+            $model = new UserProfile(['scenario' => 'defaultUser']);
+        }
         $model->user_id = $user->id;
         $model->avatar = $this->avatarUpload($user->id);
         $model->firstname = $this->firstname;
@@ -200,7 +281,7 @@ class RegistrationForm extends \webvimark\modules\UserManagement\models\forms\Re
         $model->phone = $this->phone;
         $model->sex = $this->sex;
         $model->comment = $this->comment;
-        $model->social = $model->getSocialStringFromArray($model);
+        $model->social = $model->getSocialStringFromArray($this);
         $model->save(false);
     }
 }

@@ -41,18 +41,37 @@ class UserProfile extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['firstname', 'lastname', 'patronymic', 'comment'], 'trim'],
-            [['firstname', 'lastname', 'patronymic', 'comment'], 'purgeXSS'],
-            [['user_id', 'firstname', 'lastname', 'patronymic', 'dob', 'phone', 'sex'], 'required'],
-            [['user_id', 'sex', 'job'], 'integer'],
-            ['dob', 'validateDob'],
-            ['phone', 'validatePhone'],
-            [['phone'], 'string', 'max' => 20],
-            [['firstname', 'lastname', 'patronymic'], 'validateName'],
-            [['firstname', 'lastname', 'patronymic'], 'string', 'min' => 2, 'max' => 100],
-            [['avatar'], 'string', 'max' => 100],
-            [['comment'], 'string', 'max' => 500],
-            [['social'], 'string', 'max' => 1000],
+            // Encoded user
+            [['user_id', 'firstname', 'lastname', 'patronymic', 'dob', 'phone', 'sex'], 'required', 'on' => 'encodedUser'],
+            ['user_id', 'integer', 'on' => 'encodedUser'],
+            ['avatar', 'string', 'max' => 100, 'on' => 'encodedUser'],
+            [['firstname', 'lastname', 'patronymic', 'comment'], 'trim', 'on' => 'encodedUser'],
+            [['firstname', 'lastname', 'patronymic', 'comment'], 'purgeXSS', 'on' => 'encodedUser'],
+            [['firstname', 'lastname', 'patronymic'], 'validateName', 'on' => 'encodedUser'],
+            [['firstname', 'lastname', 'patronymic'], 'string', 'min' => 2, 'max' => 300, 'on' => 'encodedUser'],
+            ['comment', 'string', 'max' => 1500, 'on' => 'encodedUser'],
+            ['dob', 'validateDob', 'on' => 'encodedUser'],
+            ['dob', 'string', 'max' => 30, 'on' => 'encodedUser'],
+            ['phone', 'validatePhone', 'on' => 'encodedUser'],
+            ['phone', 'string', 'max' => 60, 'on' => 'encodedUser'],
+            [['job', 'sex'], 'string', 'max' => 10, 'on' => 'encodedUser'],
+            [['job', 'sex'], 'validateJobSex', 'on' => 'encodedUser'],
+            ['social', 'string', 'max' => 3000, 'on' => 'encodedUser'],
+            [['firstname', 'lastname', 'patronymic', 'dob', 'phone', 'sex', 'comment', 'job', 'social'], 'validateEncode', 'on' => 'encodedUser'],
+
+            // Default user
+            [['firstname', 'lastname', 'patronymic', 'comment'], 'trim', 'on' => 'defaultUser'],
+            [['firstname', 'lastname', 'patronymic', 'comment'], 'purgeXSS', 'on' => 'defaultUser'],
+            [['user_id', 'firstname', 'lastname', 'patronymic', 'dob', 'phone', 'sex'], 'required', 'on' => 'defaultUser'],
+            [['user_id', 'sex', 'job'], 'integer', 'on' => 'defaultUser'],
+            ['dob', 'validateDob', 'on' => 'defaultUser'],
+            ['phone', 'validatePhone', 'on' => 'defaultUser'],
+            [['phone'], 'string', 'max' => 20, 'on' => 'defaultUser'],
+            [['firstname', 'lastname', 'patronymic'], 'validateName', 'on' => 'defaultUser'],
+            [['firstname', 'lastname', 'patronymic'], 'string', 'min' => 2, 'max' => 100, 'on' => 'defaultUser'],
+            [['avatar'], 'string', 'max' => 100, 'on' => 'defaultUser'],
+            [['comment'], 'string', 'max' => 500, 'on' => 'defaultUser'],
+            [['social'], 'string', 'max' => 1000, 'on' => 'defaultUser'],
         ];
     }
 
@@ -101,6 +120,62 @@ class UserProfile extends \yii\db\ActiveRecord
         if ($this->patronymic) {
             if (preg_match('/^[A-Za-zА-Яа-яЁё]{2,}$/u', $this->patronymic) !== 1) {
                 $this->addError('patronymic', UserProfileModule::t('front', 'Incorrect patronymic'));
+            }
+        }
+    }
+
+    public function validateJobSex($attribute)
+    {
+        if (
+            ($this->$attribute != '' && $this->$attribute != null) &&
+            !is_numeric($this->$attribute)
+        ) {
+            $this->addError($attribute, UserProfileModule::t('front', 'Smth went wrong'));
+        }
+    }
+
+    public function validateEncode($attribute)
+    {
+        if (
+            Yii::$app->getModule('user-profile')->dataEncode &&
+            ($this->$attribute != '' && $this->$attribute != null)
+        ) {
+            $value = SecurityHelper::encode($this->$attribute, 'aes-256-ctr', Yii::$app->getModule('user-profile')->passphrase);
+            if (!$value) {
+                $this->addError($attribute, UserProfileModule::t('front', 'Smth went wrong'));
+            } else {
+                $length = mb_strlen($value);
+                if (
+                    ($attribute == 'firstname' || $attribute == 'lastname' || $attribute == 'patronymic') &&
+                    ($length > 300)
+                ) {
+                    $this->addError($attribute, UserProfileModule::t('front', 'Max exception'));
+                } else if (
+                    ($attribute == 'comment') &&
+                    ($length > 1500)
+                ) {
+                    $this->addError($attribute, UserProfileModule::t('front', 'Max exception'));
+                } else if (
+                    ($attribute == 'social') &&
+                    ($length > 3000)
+                ) {
+                    $this->addError($attribute, UserProfileModule::t('front', 'Max exception'));
+                } else if (
+                    ($attribute == 'dob') &&
+                    ($length > 30)
+                ) {
+                    $this->addError($attribute, UserProfileModule::t('front', 'Smth went wrong'));
+                } else if (
+                    ($attribute == 'phone') &&
+                    ($length > 60)
+                ) {
+                    $this->addError($attribute, UserProfileModule::t('front', 'Smth went wrong'));
+                } else if (
+                    ($attribute == 'sex' || $attribute == 'job') &&
+                    ($length > 10)
+                ) {
+                    $this->addError($attribute, UserProfileModule::t('front', 'Smth went wrong'));
+                }
             }
         }
     }
@@ -189,6 +264,13 @@ class UserProfile extends \yii\db\ActiveRecord
             $path .= $this->oldAttributes['avatar'];
             unlink($path);
         }
+
+        if (Yii::$app->getModule('user-profile')->dataEncode) {
+            foreach (['firstname', 'lastname', 'patronymic', 'dob', 'phone', 'sex', 'comment', 'job', 'social'] as $attribute) {
+                $this->setAttributeValue($attribute);
+            }
+        }
+
         return parent::beforeSave($insert); // TODO: Change the autogenerated stub
     }
 
@@ -233,7 +315,7 @@ class UserProfile extends \yii\db\ActiveRecord
     public function getAttributeValue($attribute) {
         if (
             Yii::$app->getModule('user-profile')->dataEncode &&
-            $this->$attribute
+            ($this->$attribute != '' && $this->$attribute != null)
         ) {
             return SecurityHelper::decode($this->$attribute, 'aes-256-ctr', Yii::$app->getModule('user-profile')->passphrase);
         }
@@ -243,10 +325,9 @@ class UserProfile extends \yii\db\ActiveRecord
     public function setAttributeValue($attribute) {
         if (
             Yii::$app->getModule('user-profile')->dataEncode &&
-            $this->$attribute
+            ($this->$attribute != '' && $this->$attribute != null)
         ) {
             $this->$attribute = SecurityHelper::encode($this->$attribute, 'aes-256-ctr', Yii::$app->getModule('user-profile')->passphrase);
         }
     }
-
 }

@@ -22,7 +22,11 @@ class ProfileController extends \webvimark\components\BaseController
     public function actionCreate()
     {
         $this->layout = '//main.php';
-        $model = new UserUpdateForm(['scenario' => 'newUser']);
+        if (Yii::$app->getModule('user-profile')->dataEncode) {
+            $model = new UserUpdateForm(['scenario' => 'newUserEncoded']);
+        } else {
+            $model = new UserUpdateForm(['scenario' => 'newUserDefault']);
+        }
         $model->isNewRecord = true;
         if ($model->load(Yii::$app->request->post())) {
             if ($model->validate()) {
@@ -42,7 +46,12 @@ class ProfileController extends \webvimark\components\BaseController
                 $user->password = $model->password;
                 $user->repeat_password = $model->repeat_password;
                 $user->save();
-                $profile = new UserProfile();
+
+                if (Yii::$app->getModule('user-profile')->dataEncode) {
+                    $profile = new UserProfile(['scenario' => 'encodedUser']);
+                } else {
+                    $profile = new UserProfile(['scenario' => 'defaultUser']);
+                }
                 $profile->user_id = $user->id;
                 $profile->avatar = $model->avatarUpload($user->id, $profile->avatar);
                 $profile->firstname = $model->firstname;
@@ -55,6 +64,7 @@ class ProfileController extends \webvimark\components\BaseController
                 $profile->job = $model->job;
                 $profile->social = $profile->getSocialStringFromArray($model);
                 $profile->save();
+
                 $path = Yii::$app->getModule('user-management')->userViewPath ? Yii::$app->getModule('user-management')->userViewPath : 'user-management/user/view';
                 return $redirect === false ? '' : $this->redirect([$path, 'id' => $user->id]);
             }
@@ -71,9 +81,17 @@ class ProfileController extends \webvimark\components\BaseController
         }
         $profile = UserProfile::findOne(['user_id' => $id]);
         if ($profile === null) {
-            $profile = new UserProfile();
+            if (Yii::$app->getModule('user-profile')->dataEncode) {
+                $profile = new UserProfile(['scenario' => 'encodedUser']);
+            } else {
+                $profile = new UserProfile(['scenario' => 'defaultUser']);
+            }
         }
-        $model = new UserUpdateForm();
+        if (Yii::$app->getModule('user-profile')->dataEncode) {
+            $model = new UserUpdateForm(['scenario' => 'encodedUser']);
+        } else {
+            $model = new UserUpdateForm(['scenario' => 'defaultUser']);
+        }
         $model->isNewRecord = false;
         $model->id = $id;
         if ($model->load(Yii::$app->request->post())) {
@@ -91,6 +109,7 @@ class ProfileController extends \webvimark\components\BaseController
                 $user->blocked_at = $model->blocked_at;
                 $user->blocked_for = $model->blocked_for;
                 $user->save();
+
                 $profile->user_id = $id;
                 if ($model->avatar_delete) {
                     $profile->avatar = '';
@@ -107,10 +126,12 @@ class ProfileController extends \webvimark\components\BaseController
                 $profile->job = $model->job;
                 $profile->social = $profile->getSocialStringFromArray($model);
                 $profile->save();
+
                 $path = Yii::$app->getModule('user-management')->userViewPath ? Yii::$app->getModule('user-management')->userViewPath : 'user-management/user/view';
                 return $redirect === false ? '' : $this->redirect([$path, 'id' => $user->id]);
             }
         } else {
+
             $model->status = $user->status;
             $model->username = $user->username;
             $model->bind_to_ip = $user->bind_to_ip;
@@ -119,22 +140,25 @@ class ProfileController extends \webvimark\components\BaseController
             $model->attempts = $user->attempts;
             $model->blocked_at = $user->blocked_at;
             $model->blocked_for = $user->blocked_for;
-            $model->avatar = $profile->avatar;
-            $model->firstname = $profile->firstname;
-            $model->lastname = $profile->lastname;
-            $model->patronymic = $profile->patronymic;
-            $model->dob = $profile->dob;
-            $model->phone = $profile->phone;
-            $model->sex = $profile->sex;
-            $model->comment = $profile->comment;
-            $model->job = $profile->job;
+
+            $model->firstname = $profile->getAttributeValue('firstname');
+            $model->lastname = $profile->getAttributeValue('lastname');
+            $model->patronymic = $profile->getAttributeValue('patronymic');
+            $model->dob = $profile->getAttributeValue('dob');
+            $model->phone = $profile->getAttributeValue('phone');
+            $model->sex = $profile->getAttributeValue('sex');
+            $model->comment = $profile->getAttributeValue('comment');
+            $model->job = $profile->getAttributeValue('job');
+            $model->social = $profile->getAttributeValue('social');
+
             $social = ['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'];
             foreach ($social as $soc) {
-                $social_res = $profile->getSocialFromStringByName($profile->social, $soc);
+                $social_res = $profile->getSocialFromStringByName($model->social, $soc);
                 if ($social_res) {
                     $model->$soc = $social_res;
                 }
             }
+
         }
 
         return $this->render('update', compact('model'));
@@ -147,7 +171,11 @@ class ProfileController extends \webvimark\components\BaseController
         if ($user === null) {
             throw new NotFoundHttpException(Yii::t('yii', 'Page not found.'));
         }
-        $model = new UserUpdateForm();
+        if (Yii::$app->getModule('user-profile')->dataEncode) {
+            $model = new UserUpdateForm(['scenario' => 'encodedUser']);
+        } else {
+            $model = new UserUpdateForm(['scenario' => 'defaultUser']);
+        }
         $model->id = $id;
         $model->status = $user->status;
         $model->username = $user->username;
@@ -164,22 +192,26 @@ class ProfileController extends \webvimark\components\BaseController
         $model->updated_by = $user->updated_by;
         $profile = UserProfile::findOne(['user_id' => $id]);
         if ($profile !== null) {
+
             $model->avatar = $profile->avatar;
-            $model->firstname = $profile->firstname;
-            $model->lastname = $profile->lastname;
-            $model->patronymic = $profile->patronymic;
-            $model->dob = $profile->dob;
-            $model->phone = $profile->phone;
-            $model->sex = $profile->sex;
-            $model->comment = $profile->comment;
-            $model->job = $profile->job;
+            $model->firstname = $profile->getAttributeValue('firstname');
+            $model->lastname = $profile->getAttributeValue('lastname');
+            $model->patronymic = $profile->getAttributeValue('patronymic');
+            $model->dob = $profile->getAttributeValue('dob');
+            $model->phone = $profile->getAttributeValue('phone');
+            $model->sex = $profile->getAttributeValue('sex');
+            $model->comment = $profile->getAttributeValue('comment');
+            $model->job = $profile->getAttributeValue('job');
+            $model->social = $profile->getAttributeValue('social');
+
             $social = ['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'];
             foreach ($social as $soc) {
-                $social_res = $profile->getSocialFromStringByName($profile->social, $soc);
+                $social_res = $profile->getSocialFromStringByName($model->social, $soc);
                 if ($social_res) {
                     $model->$soc = $social_res;
                 }
             }
+
         }
         return $this->render('view', compact('model'));
     }

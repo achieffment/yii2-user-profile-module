@@ -83,6 +83,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'value' => $model->attempts,
                         'format' => 'raw',
                     ),
+
                     array(
                         'attribute' => 'firstname',
                         'value' => $model->firstname,

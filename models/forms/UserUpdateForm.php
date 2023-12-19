@@ -66,53 +66,65 @@ class UserUpdateForm extends Model
     public function rules()
     {
         return [
-            [['firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'trim'],
-            [['username', 'firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'purgeXSS'],
 
             [['id', 'status', 'email_confirmed', 'attempts', 'job'], 'integer'],
-
             ['username', 'required'],
+            ['username', 'purgeXSS'],
             ['username', 'validateUsername'],
             ['username', 'trim'],
-
             ['blocked_at', 'validateBlockedAt'],
             ['blocked_for', 'validateBlockedFor'],
-
             ['email', 'email'],
             ['email', 'validateEmailConfirmedUnique'],
-
             ['bind_to_ip', 'validateBindToIp'],
             ['bind_to_ip', 'trim'],
             ['bind_to_ip', 'string', 'max' => 255],
-
             ['attempts', 'default', 'value' => 0],
+            ['password', 'required', 'on' => ['newUser', 'newUserEncoded', 'newUserDefault']],
+            ['password', 'string', 'max' => 255, 'on' => ['newUser', 'newUserEncoded', 'newUserDefault']],
+            ['password', 'trim', 'on' => ['newUser', 'newUserEncoded', 'newUserDefault']],
+            ['password', 'match', 'pattern' => Yii::$app->getModule('user-management')->passwordRegexp, 'on' => ['newUser', 'newUserEncoded', 'newUserDefault']],
+            ['repeat_password', 'required', 'on' => ['newUser', 'newUserEncoded', 'newUserDefault']],
+            ['repeat_password', 'compare', 'compareAttribute' => 'password', 'on' => ['newUser', 'newUserEncoded', 'newUserDefault']],
 
-            [['firstname', 'lastname', 'patronymic', 'dob', 'phone', 'sex'], 'required'],
+            // Encoded user
+            [['firstname', 'lastname', 'patronymic', 'dob', 'phone', 'sex'], 'required', 'on' => ['encodedUser', 'newUserEncoded']],
+            ['avatar', 'string','max' => 100, 'on' => ['encodedUser', 'newUserEncoded']],
+            ['avatar_file', 'file', 'on' => ['encodedUser', 'newUserEncoded']],
+            [['firstname', 'lastname', 'patronymic', 'comment'], 'trim', 'on' => ['encodedUser', 'newUserEncoded']],
+            [['firstname', 'lastname', 'patronymic', 'comment'], 'purgeXSS', 'on' => ['encodedUser', 'newUserEncoded']],
+            [['firstname', 'lastname', 'patronymic'], 'validateName', 'on' => ['encodedUser', 'newUserEncoded']],
+            [['firstname', 'lastname', 'patronymic'], 'string', 'min' => 2, 'max' => 300, 'on' => ['encodedUser', 'newUserEncoded']],
+            ['comment', 'string', 'max' => 1500, 'on' => ['encodedUser', 'newUserEncoded']],
+            ['dob', 'validateDob', 'on' => ['encodedUser', 'newUserEncoded']],
+            ['dob', 'string', 'max' => 30, 'on' => ['encodedUser', 'newUserEncoded']],
+            ['phone', 'validatePhone', 'on' => ['encodedUser', 'newUserEncoded']],
+            ['phone', 'string', 'max' => 60, 'on' => ['encodedUser', 'newUserEncoded']],
+            [['job', 'sex'], 'string', 'max' => 10, 'on' => ['encodedUser', 'newUserEncoded']],
+            [['job', 'sex'], 'validateJobSex', 'on' => ['encodedUser', 'newUserEncoded']],
+            ['social', 'string', 'max' => 3000, 'on' => ['encodedUser', 'newUserEncoded']],
+            [['firstname', 'lastname', 'patronymic', 'dob', 'phone', 'sex', 'comment', 'job', 'social'], 'validateEncode', 'on' => ['encodedUser', 'newUserEncoded']],
+            [['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'trim', 'on' => ['encodedUser', 'newUserEncoded']],
+            [['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'purgeXSS', 'on' => ['encodedUser', 'newUserEncoded']],
+            [['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'string', 'max' => 300, 'on' => ['encodedUser', 'newUserEncoded']],
+            [['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'validateEncode', 'on' => ['encodedUser', 'newUserEncoded']],
 
-            [['firstname', 'lastname', 'patronymic'], 'validateName'],
-            [['firstname', 'lastname', 'patronymic'], 'string', 'min' => 2, 'max' => 100],
-
-            ['sex', 'integer'],
-            ['dob', 'validateDob'],
-
-            ['phone', 'validatePhone'],
-            ['phone', 'string', 'max' => 20],
-
-            ['avatar', 'string', 'max' => 100],
-            ['avatar_file', 'file'],
-            ['avatar_delete', 'boolean'],
-
-            ['comment', 'string', 'max' => 500],
-            ['social', 'string', 'max' => 1000],
-
-            [['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'string', 'max' => 100],
-
-            ['password', 'required', 'on' => 'newUser'],
-            ['password', 'string', 'max' => 255, 'on' => 'newUser'],
-            ['password', 'trim', 'on' => 'newUser'],
-            ['password', 'match', 'pattern' => Yii::$app->getModule('user-management')->passwordRegexp, 'on' => 'newUser'],
-            ['repeat_password', 'required', 'on' => 'newUser'],
-            ['repeat_password', 'compare', 'compareAttribute' => 'password', 'on' => 'newUser'],
+            // Default user
+            [['firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'trim', 'on' => ['defaultUser', 'newUserDefault']],
+            [['firstname', 'lastname', 'patronymic', 'comment', 'vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'purgeXSS', 'on' => ['defaultUser', 'newUserDefault']],
+            [['firstname', 'lastname', 'patronymic', 'dob', 'phone', 'sex'], 'required', 'on' => ['defaultUser', 'newUserDefault']],
+            [['firstname', 'lastname', 'patronymic'], 'validateName', 'on' => ['defaultUser', 'newUserDefault']],
+            [['firstname', 'lastname', 'patronymic'], 'string', 'min' => 2, 'max' => 100, 'on' => ['defaultUser', 'newUserDefault']],
+            ['avatar', 'string', 'max' => 100, 'on' => ['defaultUser', 'newUserDefault']],
+            ['avatar_file', 'file', 'on' => ['defaultUser', 'newUserDefault']],
+            ['avatar_delete', 'boolean', 'on' => ['defaultUser', 'newUserDefault']],
+            ['sex', 'integer', 'on' => ['defaultUser', 'newUserDefault']],
+            ['dob', 'validateDob', 'on' => ['defaultUser', 'newUserDefault']],
+            ['phone', 'validatePhone', 'on' => ['defaultUser', 'newUserDefault']],
+            ['phone', 'string', 'max' => 20, 'on' => ['defaultUser', 'newUserDefault']],
+            ['comment', 'string', 'max' => 500, 'on' => ['defaultUser', 'newUserDefault']],
+            ['social', 'string', 'max' => 1000, 'on' => ['defaultUser', 'newUserDefault']],
+            [['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook'], 'string', 'max' => 100, 'on' => ['defaultUser', 'newUserDefault']],
         ];
     }
 
@@ -230,6 +242,67 @@ class UserUpdateForm extends Model
         if ($this->patronymic) {
             if (preg_match('/^[A-Za-zА-Яа-яЁё]{2,}$/u', $this->patronymic) !== 1) {
                 $this->addError('patronymic', UserProfileModule::t('front', 'Incorrect patronymic'));
+            }
+        }
+    }
+
+    public function validateJobSex($attribute)
+    {
+        if (
+            ($this->$attribute != '' && $this->$attribute != null) &&
+            !is_numeric($this->$attribute)
+        ) {
+            $this->addError($attribute, UserProfileModule::t('front', 'Smth went wrong'));
+        }
+    }
+
+    public function validateEncode($attribute)
+    {
+        if (
+            Yii::$app->getModule('user-profile')->dataEncode &&
+            ($this->$attribute != '' && $this->$attribute != null)
+        ) {
+            $value = SecurityHelper::encode($this->$attribute, 'aes-256-ctr', Yii::$app->getModule('user-profile')->passphrase);
+            if (!$value) {
+                $this->addError($attribute, UserProfileModule::t('front', 'Smth went wrong'));
+            } else {
+                $length = mb_strlen($value);
+                if (
+                    ($attribute == 'firstname' || $attribute == 'lastname' || $attribute == 'patronymic') &&
+                    ($length > 300)
+                ) {
+                    $this->addError($attribute, UserProfileModule::t('front', 'Max exception'));
+                } else if (
+                    ($attribute == 'comment') &&
+                    ($length > 1500)
+                ) {
+                    $this->addError($attribute, UserProfileModule::t('front', 'Max exception'));
+                } else if (
+                    ($attribute == 'social') &&
+                    ($length > 3000)
+                ) {
+                    $this->addError($attribute, UserProfileModule::t('front', 'Max exception'));
+                } else if (
+                    ($attribute == 'dob') &&
+                    ($length > 30)
+                ) {
+                    $this->addError($attribute, UserProfileModule::t('front', 'Smth went wrong'));
+                } else if (
+                    ($attribute == 'phone') &&
+                    ($length > 60)
+                ) {
+                    $this->addError($attribute, UserProfileModule::t('front', 'Smth went wrong'));
+                } else if (
+                    ($attribute == 'sex' || $attribute == 'job') &&
+                    ($length > 10)
+                ) {
+                    $this->addError($attribute, UserProfileModule::t('front', 'Smth went wrong'));
+                } else if (
+                    in_array($attribute, ['vk', 'ok', 'telegram', 'whatsapp', 'viber', 'youtube', 'twitter', 'facebook']) &&
+                    ($length > 300)
+                ) {
+                    $this->addError($attribute, UserProfileModule::t('front', 'Max exception'));
+                }
             }
         }
     }
