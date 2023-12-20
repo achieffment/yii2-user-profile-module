@@ -6,7 +6,7 @@
     <div class="form-group">
         <button type="button" class="btn btn-secondary mr-4" data-role="generate"><?= UserManagementModule::t('back', 'Generate password') ?></button>
         <span class="badge badge-secondary mr-4" data-role="generate-value"></span>
-        <span class="badge badge-secondary" data-role="notify"><?= UserManagementModule::t('back', 'Copied') ?></span>
+        <span class="d-none badge badge-secondary" data-role="notify"><?= UserManagementModule::t('back', 'Copied') ?></span>
     </div>
     <div class="d-none position-absolute fixed-top alert alert-secondary fade" role="alert" >
 

@@ -76,6 +76,13 @@ class UserProfileModule extends \yii\base\Module
      */
     public $dataEncode = false;
 
+    /**
+     * Table aliases
+     *
+     * @var string
+     */
+    public $profile_table = '{{%user_profile}}';
+
     public $controllerNamespace = 'chieff\modules\UserProfile\controllers';
 
     /**

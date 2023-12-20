@@ -82,7 +82,9 @@ Configuration
 ],
 ```
 
-2) Run migrations from the console, delete user table first if you use yii2 advanced
+3) Follow instructions [yii2-user-management-module](https://github.com/achieffment/yii2-user-management-module) and complete migrations
+
+4) Run migrations from the console
 ```
 ./yii migrate --migrationPath=vendor/chieff/yii2-user-profile-module/migrations/
 ```
@@ -92,7 +94,7 @@ If you want delete tables later and didn't migrate another tables, use:
 ./yii migrate/down --migrationPath=vendor/chieff/yii2-user-profile-module/migrations/
 ```
 
-3) Follow instructions [yii2-user-management-module](https://github.com/achieffment/yii2-user-management-module).
+
 
 To see full list of options check *UserProfileModule* file
 
