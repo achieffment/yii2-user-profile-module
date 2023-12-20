@@ -11,6 +11,7 @@
         "chieff/yii2-user-management-module": "dev-master",
         "kartik-v/yii2-widget-datepicker": "@dev",
         "kartik-v/yii2-widget-datetimepicker": "*",
-        "kartik-v/yii2-widget-fileinput": "dev-master"
+        "kartik-v/yii2-widget-fileinput": "dev-master",
+        "rmrevin/yii2-fontawesome": "~3.5"
     }
 }
