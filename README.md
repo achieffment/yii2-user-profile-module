@@ -32,7 +32,14 @@ to the require section of your `composer.json` file.
 
 Forked
 ---
-It is a fork of webvimark [module-user-management](https://github.com/webvimark/user-management), so be sure that you are not using that module in require sections of composer. This may have an impact because of this fork uses same namespaces. 
+It is a fork of webvimark [module-user-management](https://github.com/webvimark/user-management), so be sure that you are not using that module in require section of composer. This may have an impact because of this fork uses same namespaces. Also you can not use:
+
+* [components](https://github.com/webvimark/components)
+* [date-range-picker](https://github.com/webvimark/date-range-picker)
+* [grid-bulk-actions](https://github.com/webvimark/grid-bulk-actions)
+* [grid-page-size](https://github.com/webvimark/grid-page-size)
+
+But don't be scared, this fork includes that packages but with another name for better working!
 
 Configuration
 ---
@@ -64,6 +71,10 @@ Configuration
 ```php
 'modules' => [
     'user-management' => [
+        'registrationFormClass' => 'chieff\modules\UserProfile\models\forms\RegistrationForm',
+        'registrationFormClassView' => '@vendor\chieff\yii2-user-profile-module\views\auth\registration',
+        'registrationFormScenario' => 'defaultUser', // Use encodedUser, if you are using dataEncode
+        'profileModelClass' => '\chieff\modules\UserProfile\models\UserProfile',
         'userCreatePath' => '/user-profile/profile/create',
         'userUpdatePath' => '/user-profile/profile/update',
         'userViewPath'   => '/user-profile/profile/view',
