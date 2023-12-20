@@ -77,6 +77,13 @@ class UserProfileModule extends \yii\base\Module
     public $dataEncode = false;
 
     /**
+     * If set true, migration will create special table
+     *
+     * @var array
+     */
+    public $dataEncodeMigration = true;
+
+    /**
      * Table aliases
      *
      * @var string

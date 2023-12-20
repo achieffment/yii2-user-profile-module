@@ -67,6 +67,12 @@ Configuration
 'passphrase' => 'your passphare'
 ```
 
+Current profile table includes only varchar columns because of possible data encoding that can be string or number.
+If you don't want to use data encoding at all, use option for migration that will create optimal table:
+```php
+'dataEncodeMigration' => false
+```
+
 2) Also add routes for user-management module in your config/web.php
 ```php
 'modules' => [
@@ -91,10 +97,8 @@ Configuration
 
 If you want delete tables later and didn't migrate another tables, use:
 ```
-./yii migrate/down --migrationPath=vendor/chieff/yii2-user-profile-module/migrations/
+./yii migrate/down 3 --migrationPath=vendor/chieff/yii2-user-profile-module/migrations/
 ```
-
-
 
 To see full list of options check *UserProfileModule* file
 

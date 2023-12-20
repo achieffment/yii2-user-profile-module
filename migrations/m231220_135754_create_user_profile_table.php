@@ -5,14 +5,14 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%user_profile}}`.
  */
-class m231220_132400_create_user_profile_table extends Migration
+class m231220_135754_create_user_profile_table extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        if (\Yii::$app->getModule('user-profile')->dataEncodeMigration === false) {
+        if (\Yii::$app->getModule('user-profile')->dataEncodeMigration === true) {
             return true;
         }
 
@@ -23,15 +23,15 @@ class m231220_132400_create_user_profile_table extends Migration
             'id' => 'pk',
             'user_id' => 'int not null',
             'avatar' => 'varchar(100) default null',
-            'firstname' => 'varchar(300) not null',
-            'lastname' => 'varchar(300) not null',
-            'patronymic' => 'varchar(300) not null',
-            'dob' => 'varchar(30) not null',
-            'phone' => 'varchar(60) not null',
-            'sex' => 'varchar(10) not null',
-            'comment' => 'varchar(1500) default null',
-            'job' => 'varchar(10) default null',
-            'social' => 'varchar(3000) default null',
+            'firstname' => 'varchar(100) not null',
+            'lastname' => 'varchar(100) not null',
+            'patronymic' => 'varchar(100) not null',
+            'dob' => 'int not null',
+            'phone' => 'varchar(20) not null',
+            'sex' => 'tinyint not null',
+            'comment' => 'varchar(500) default null',
+            'job' => 'tinyint default null',
+            'social' => 'varchar(1000) default null',
         ), $tableOptions);
     }
 
@@ -40,7 +40,7 @@ class m231220_132400_create_user_profile_table extends Migration
      */
     public function safeDown()
     {
-        if (\Yii::$app->getModule('user-profile')->dataEncodeMigration === false) {
+        if (\Yii::$app->getModule('user-profile')->dataEncodeMigration === true) {
             return true;
         }
 
