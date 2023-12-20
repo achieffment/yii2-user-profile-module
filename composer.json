@@ -7,7 +7,8 @@
         }
     },
     "require": {
-        "chieff/helpers": "*",
+        "chieff/helpers": "dev-master",
+        "chieff/yii2-user-management-module": "dev-master",
         "kartik-v/yii2-widget-fileinput": "dev-master"
     }
 }
