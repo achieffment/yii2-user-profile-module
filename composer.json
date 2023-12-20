@@ -9,6 +9,8 @@
     "require": {
         "chieff/helpers": "dev-main",
         "chieff/yii2-user-management-module": "dev-master",
+        "kartik-v/yii2-widget-datepicker": "@dev",
+        "kartik-v/yii2-widget-datetimepicker": "*",
         "kartik-v/yii2-widget-fileinput": "dev-master"
     }
 }
