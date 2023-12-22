@@ -45,28 +45,32 @@ class ProfileController extends \webvimark\components\BaseController
                 $user->blocked_for = $model->blocked_for;
                 $user->password = $model->password;
                 $user->repeat_password = $model->repeat_password;
-                $user->save();
+                $result = $user->save();
 
-                if (Yii::$app->getModule('user-profile')->dataEncode) {
-                    $profile = new UserProfile(['scenario' => 'encodedUser']);
-                } else {
-                    $profile = new UserProfile(['scenario' => 'defaultUser']);
+                if ($result) {
+                    if (Yii::$app->getModule('user-profile')->dataEncode) {
+                        $profile = new UserProfile(['scenario' => 'encodedUser']);
+                    } else {
+                        $profile = new UserProfile(['scenario' => 'defaultUser']);
+                    }
+                    $profile->user_id = $user->id;
+                    $profile->avatar = $model->avatarUpload($user->id, $profile->avatar);
+                    $profile->firstname = $model->firstname;
+                    $profile->lastname = $model->lastname;
+                    $profile->patronymic = $model->patronymic;
+                    $profile->dob = $model->dob;
+                    $profile->phone = $model->phone;
+                    $profile->sex = $model->sex;
+                    $profile->comment = $model->comment;
+                    $profile->job = $model->job;
+                    $profile->social = $profile->getSocialStringFromArray($model);
+                    $result = $profile->save();
+
+                    if ($result) {
+                        $path = Yii::$app->getModule('user-management')->userViewPath ? Yii::$app->getModule('user-management')->userViewPath : 'user-management/user/view';
+                        return $redirect === false ? '' : $this->redirect([$path, 'id' => $user->id]);
+                    }
                 }
-                $profile->user_id = $user->id;
-                $profile->avatar = $model->avatarUpload($user->id, $profile->avatar);
-                $profile->firstname = $model->firstname;
-                $profile->lastname = $model->lastname;
-                $profile->patronymic = $model->patronymic;
-                $profile->dob = $model->dob;
-                $profile->phone = $model->phone;
-                $profile->sex = $model->sex;
-                $profile->comment = $model->comment;
-                $profile->job = $model->job;
-                $profile->social = $profile->getSocialStringFromArray($model);
-                $profile->save();
-
-                $path = Yii::$app->getModule('user-management')->userViewPath ? Yii::$app->getModule('user-management')->userViewPath : 'user-management/user/view';
-                return $redirect === false ? '' : $this->redirect([$path, 'id' => $user->id]);
             }
         }
         return $this->render('create', compact('model'));
@@ -108,27 +112,31 @@ class ProfileController extends \webvimark\components\BaseController
                 $user->attempts = $model->attempts;
                 $user->blocked_at = $model->blocked_at;
                 $user->blocked_for = $model->blocked_for;
-                $user->save();
+                $result = $user->save();
 
-                $profile->user_id = $id;
-                if ($model->avatar_delete) {
-                    $profile->avatar = '';
-                } else {
-                    $profile->avatar = $model->avatarUpload($id, $profile->avatar);
+                if ($result) {
+                    $profile->user_id = $id;
+                    if ($model->avatar_delete) {
+                        $profile->avatar = '';
+                    } else {
+                        $profile->avatar = $model->avatarUpload($id, $profile->avatar);
+                    }
+                    $profile->firstname = $model->firstname;
+                    $profile->lastname = $model->lastname;
+                    $profile->patronymic = $model->patronymic;
+                    $profile->dob = $model->dob;
+                    $profile->phone = $model->phone;
+                    $profile->sex = $model->sex;
+                    $profile->comment = $model->comment;
+                    $profile->job = $model->job;
+                    $profile->social = $profile->getSocialStringFromArray($model);
+                    $result = $profile->save();
+
+                    if ($result) {
+                        $path = Yii::$app->getModule('user-management')->userViewPath ? Yii::$app->getModule('user-management')->userViewPath : 'user-management/user/view';
+                        return $redirect === false ? '' : $this->redirect([$path, 'id' => $user->id]);
+                    }
                 }
-                $profile->firstname = $model->firstname;
-                $profile->lastname = $model->lastname;
-                $profile->patronymic = $model->patronymic;
-                $profile->dob = $model->dob;
-                $profile->phone = $model->phone;
-                $profile->sex = $model->sex;
-                $profile->comment = $model->comment;
-                $profile->job = $model->job;
-                $profile->social = $profile->getSocialStringFromArray($model);
-                $profile->save();
-
-                $path = Yii::$app->getModule('user-management')->userViewPath ? Yii::$app->getModule('user-management')->userViewPath : 'user-management/user/view';
-                return $redirect === false ? '' : $this->redirect([$path, 'id' => $user->id]);
             }
         } else {
 
